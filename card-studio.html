@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carcophony Card Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f1a;
+    --panel: #16162a;
+    --border: #252540;
+    --accent: #e94560;
+    --dim: #666;
+  }
+
+  body {
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    background: var(--panel);
+    border-bottom: 2px solid var(--accent);
+    padding: 13px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  #topbar .logo { font-size: 26px; font-weight: 900; letter-spacing: 3px; font-family: 'Black Han Sans', Impact, sans-serif; }
+  #topbar .logo span { color: var(--accent); }
+  #topbar .sub { border-left: 2px solid rgba(233,69,96,0.3); padding-left: 14px; color: var(--dim); font-size: 12px; letter-spacing: 1px; margin-left: 14px; }
+  #topbar .tagline { font-size: 11px; color: #444; letter-spacing: 1px; }
+
+  /* ── MAIN LAYOUT ── */
+  #main { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 57px); }
+
+  /* ── LEFT PANEL ── */
+  #controls {
+    width: 290px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 16px;
+    flex-shrink: 0;
+  }
+  #controls::-webkit-scrollbar { width: 4px; }
+  #controls::-webkit-scrollbar-track { background: var(--bg); }
+  #controls::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .section { margin-bottom: 22px; }
+  .section-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 2px;
+    margin-bottom: 12px; padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  label.field-label { font-size: 11px; font-weight: 700; color: var(--dim); letter-spacing: 1px; display: block; margin-bottom: 4px; margin-top: 10px; }
+  label.field-label:first-child { margin-top: 0; }
+
+  input[type=text], input[type=number], select {
+    width: 100%; padding: 8px 10px; border-radius: 8px;
+    border: 1.5px solid var(--border); font-size: 14px;
+    font-family: inherit; background: #1e1e36; color: #fff;
+    outline: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  select option { background: #1e1e36; }
+
+  /* Mystery button */
+  #btn-random {
+    width: 100%; margin-bottom: 18px; padding: 11px 0;
+    border-radius: 10px; border: 2px solid;
+    font-size: 14px; font-weight: 800; letter-spacing: 2px;
+    cursor: pointer; font-family: inherit;
+    transition: filter 0.2s, transform 0.2s;
+  }
+  #btn-random:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  /* Upload boxes */
+  .upload-box {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 14px;
+    text-align: center; cursor: pointer; background: #1a1a2e;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; min-height: 56px; transition: border-color 0.2s;
+  }
+  .upload-box:hover { border-color: #555; }
+  .upload-box .ok { color: #4ade80; font-size: 13px; font-weight: 700; }
+  .upload-box .hint { color: var(--dim); font-size: 11px; margin-top: 2px; }
+  .upload-box .placeholder { color: var(--dim); font-size: 12px; }
+  .upload-preview { height: 32px; object-fit: contain; }
+  .btn-remove {
+    width: 100%; margin-top: 6px; background: none;
+    border: 1px solid var(--accent); color: var(--accent);
+    border-radius: 6px; padding: 4px 12px; cursor: pointer;
+    font-size: 12px; font-family: inherit;
+  }
+  .btn-remove:hover { background: rgba(233,69,96,0.1); }
+
+  /* Stat toggles */
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; cursor: pointer; }
+  .toggle-switch {
+    width: 34px; height: 19px; border-radius: 10px;
+    background: var(--border); position: relative;
+    transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-switch.on { background: #34d399; }
+  .toggle-switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 15px; height: 15px; border-radius: 8px;
+    background: #fff; transition: left 0.2s;
+  }
+  .toggle-switch.on::after { left: 17px; }
+  .toggle-label { font-size: 13px; font-weight: 600; letter-spacing: 0.8px; color: #333; }
+  .toggle-label.active { color: #fff; }
+  .toggle-label.enabled { color: #484870; }
+  .over-limit { font-size: 10px; color: #444; margin-left: 5px; }
+
+  /* Radio rows */
+  .radio-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; cursor: pointer; }
+  .radio-row input { accent-color: #60a5fa; }
+  .radio-row .rl { font-size: 13px; font-weight: 600; color: #aaa; }
+  .radio-row .rl.active { color: #60a5fa; }
+  .radio-row .rd { font-size: 11px; color: #444; margin-left: auto; }
+
+  /* ── CENTRE ── */
+  #centre { flex: 1; display: flex; flex-direction: column; background: #0a0a18; overflow: hidden; }
+
+  /* Variant tabs */
+  #variant-bar {
+    background: var(--panel); border-bottom: 1px solid var(--border);
+    padding: 14px 24px; flex-shrink: 0;
+  }
+  #variant-bar .vb-hint { font-size: 10px; color: var(--dim); letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
+  #variant-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+  .vtab {
+    padding: 10px 18px; border-radius: 10px; cursor: pointer;
+    border: 2px solid var(--border); background: #1a1a2e;
+    flex: 1 0 130px; user-select: none; transition: all 0.2s;
+  }
+  .vtab .vname { font-weight: 800; font-size: 15px; letter-spacing: 1px; color: #fff; }
+  .vtab .vdesc { font-size: 11px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
+
+  /* Preview area */
+  #preview-area {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px; gap: 18px; overflow: auto;
+  }
+  #preview-label { font-size: 11px; color: #383860; letter-spacing: 2px; }
+  #card-wrapper { transition: transform 0.3s; }
+  #colour-pip { display: flex; align-items: center; gap: 8px; }
+  #colour-pip .pip { width: 12px; height: 12px; border-radius: 3px; }
+  #colour-pip .cname { font-size: 11px; color: #444; letter-spacing: 1px; }
+
+  .btn-row { display: flex; gap: 12px; }
+  .btn-family {
+    background: #1a1a2e; border: 2px solid; border-radius: 10px;
+    padding: 12px 24px; font-size: 13px; font-weight: 800;
+    letter-spacing: 2px; cursor: pointer; font-family: inherit;
+    transition: all 0.2s; color: #fff;
+  }
+  .btn-family:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  #btn-download {
+    border: none; border-radius: 10px; padding: 12px 32px;
+    font-size: 13px; font-weight: 800; letter-spacing: 2px;
+    cursor: pointer; font-family: inherit; color: #fff;
+    background: var(--accent); transition: all 0.2s;
+    box-shadow: 0 4px 24px rgba(233,69,96,0.4);
+  }
+  #btn-download:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+  #btn-download:disabled { background: #2a2a4a; box-shadow: none; cursor: default; }
+
+  #tip-box {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 18px;
+    max-width: 440px; text-align: center;
+    font-size: 11px; color: #666; line-height: 1.8;
+  }
+
+  /* ── PACK MODAL ── */
+  #pack-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92); z-index: 1000;
+    flex-direction: column; align-items: center;
+    justify-content: center; gap: 20px;
+    overflow: auto; padding: 32px;
+  }
+  #pack-modal.open { display: flex; }
+  #pack-modal .pm-hint { font-size: 13px; color: #888; letter-spacing: 3px; }
+  #pack-modal .pm-title { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 2px; }
+  #pack-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+  .pack-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .pack-col .pv-name { font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+  .pack-col .pv-ed { font-size: 10px; color: #555; letter-spacing: 1px; }
+  #btn-close-pack {
+    margin-top: 8px; background: none; border: 1px solid #444;
+    color: #aaa; border-radius: 8px; padding: 10px 28px;
+    cursor: pointer; font-size: 13px; font-family: inherit; letter-spacing: 2px;
+  }
+  #btn-close-pack:hover { border-color: #888; color: #fff; }
+
+  /* ── THE CARD ITSELF ── */
+  .card-root {
+    border-radius: 18px; overflow: hidden; position: relative;
+    font-family: 'Black Han Sans', Impact, 'Arial Black', sans-serif;
+    flex-shrink: 0;
+  }
+
+  /* Portrait card */
+  .card-portrait { display: flex; flex-direction: column; background: #fff; }
+  .card-header {
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; flex-shrink: 0;
+  }
+  .card-header .hatch {
+    position: absolute; inset: 0; opacity: 0.06;
+    background: repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,1) 8px,rgba(255,255,255,1) 9px);
+  }
+  .card-header .maker-name {
+    font-size: inherit; font-weight: 900; color: #fff;
+    letter-spacing: 3px; z-index: 1; font-family: 'Black Han Sans', Impact, sans-serif;
+  }
+  .card-header .accent-line { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+  .card-model-bar {
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; flex-shrink: 0; font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; color: #1a1a1a; letter-spacing: 0.3px;
+  }
+  .card-image-area {
+    overflow: hidden; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+    background: linear-gradient(180deg,#f5f5f5 0%,#fff 100%);
+    padding: 8px 10px;
+  }
+  .card-image-area img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .card-image-area .no-img { color: #ccc; font-size: 13px; text-align: center; font-style: italic; font-family: 'Rajdhani', sans-serif; }
+  .card-divider { flex-shrink: 0; height: 3px; }
+  .card-stats { display: flex; flex-direction: column; justify-content: space-evenly; background: #fff; }
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-left { display: flex; align-items: center; gap: 8px; }
+  .stat-icon {
+    border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+  .stat-label { font-weight: 700; color: #777; letter-spacing: 1.2px; font-family: 'Rajdhani', sans-serif; }
+  .stat-value { font-weight: 900; font-family: 'Black Han Sans', Impact, sans-serif; }
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; padding: 0 14px;
+  }
+  .footer-left { display: flex; align-items: center; gap: 8px; }
+  .footer-left img { height: 24px; width: 24px; object-fit: contain; border-radius: 4px; }
+  .footer-brand { font-size: 10px; font-weight: 800; letter-spacing: 3px; font-family: 'Rajdhani', sans-serif; }
+  .variant-badge {
+    border-radius: 4px; font-size: 9px; font-weight: 800;
+    color: #fff; letter-spacing: 1.5px; padding: 3px 8px;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .variant-badge.small { padding: 2px 5px; font-size: 8px; }
+
+  /* Hero card */
+  .card-hero { position: relative; }
+  .card-hero .hero-bg { position: absolute; inset: 0; }
+  .card-hero .hero-hatch { position: absolute; inset: 0; opacity: 0.04; background: repeating-linear-gradient(45deg,transparent,transparent 12px,rgba(255,255,255,1) 12px,rgba(255,255,255,1) 13px); }
+  .card-hero .hero-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .card-hero .hero-img img { width: 100%; height: 100%; object-fit: contain; }
+  .card-hero .hero-accent-top { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
+  .card-hero .hero-top { position: absolute; top: 14px; left: 0; right: 0; text-align: center; z-index: 2; }
+  .card-hero .hero-maker { font-weight: 900; color: #fff; letter-spacing: 4px; font-family: 'Black Han Sans', Impact, sans-serif; }
+  .card-hero .hero-model { color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-top: 2px; font-family: 'Rajdhani', sans-serif; }
+  .card-hero .hero-overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 3;
+    background: linear-gradient(180deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.58) 38%,rgba(0,0,0,0.58) 62%,rgba(0,0,0,0.1) 100%);
+  }
+  .card-hero .hero-field-label {
+    font-weight: 700; letter-spacing: 5px; text-transform: uppercase;
+    margin-bottom: 4px; opacity: 0.95;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .card-hero .hero-unit {
+    font-weight: 700; letter-spacing: 5px; margin-top: 6px;
+    opacity: 0.9; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .card-hero .hero-footer { position: absolute; bottom: 0; left: 0; right: 0; z-index: 4; }
+  .card-hero .hero-footer-accent { height: 3px; }
+  .card-hero .hero-footer-bar {
+    background: rgba(0,0,0,0.6); padding: 8px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .hero-footer-brand { display: flex; align-items: center; gap: 8px; }
+  .hero-footer-brand img { height: 22px; width: 22px; object-fit: contain; border-radius: 4px; }
+
+  /* Landscape card */
+  .card-landscape { display: flex; flex-direction: row; }
+  .land-left {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: space-between; position: relative; overflow: hidden;
+  }
+  .land-left .hatch { position: absolute; inset: 0; opacity: 0.06; background: repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,1) 10px,rgba(255,255,255,1) 11px); }
+  .land-left .lm-name { font-weight: 900; color: #fff; line-height: 1; font-family: 'Black Han Sans', Impact, sans-serif; text-align: center; z-index: 1; }
+  .land-left .lm-bar { border-radius: 2px; margin: 8px auto; }
+  .land-left .lm-model { color: rgba(255,255,255,0.75); font-weight: 600; line-height: 1.2; font-family: 'Rajdhani', sans-serif; text-align: center; z-index: 1; }
+  .land-left .lm-bottom { z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .land-right { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; }
+  .land-img { flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg,#f5f5f5,#fff); }
+  .land-img img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 10px; }
+  .land-stats { padding: 8px 16px; }
+  .land-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,0.07); }
+  .land-stat-row:last-child { border-bottom: none; }
+  .land-stat-label { font-size: 11px; font-weight: 700; color: #888; letter-spacing: 1px; font-family: 'Rajdhani', sans-serif; }
+  .land-stat-val { font-size: 15px; font-weight: 900; font-family: 'Black Han Sans', Impact, sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div style="display:flex;align-items:center;gap:0">
+    <div class="logo">CAR<span>COPHONY</span></div>
+    <div class="sub">CARD STUDIO</div>
+  </div>
+  <div class="tagline">Every card a collectible</div>
+</div>
+
+<div id="main">
+
+  <!-- LEFT CONTROLS -->
+  <div id="controls">
+
+    <button id="btn-random">🎲 MYSTERY CAR</button>
+
+    <!-- Car Identity -->
+    <div class="section">
+      <div class="section-title" style="color:#e94560">🚗 CAR IDENTITY</div>
+      <label class="field-label">MAKER</label>
+      <select id="sel-maker">
+        <option>Aston Martin</option><option>BMW</option><option>Bugatti</option>
+        <option>Dodge</option><option selected>Ferrari</option><option>Ford</option>
+        <option>Lamborghini</option><option>McLaren</option><option>Mercedes</option>
+        <option>Porsche</option><option>Renault</option><option>Toyota</option>
+        <option>Volvo</option><option>Custom</option>
+      </select>
+      <div id="custom-name-row" style="display:none">
+        <label class="field-label">CUSTOM MAKER NAME</label>
+        <input type="text" id="inp-custom-maker" placeholder="e.g. Pagani">
+      </div>
+      <label class="field-label">RACING COLOURS</label>
+      <select id="sel-country">
+        <option value="british">British Racing Green</option>
+        <option value="american">American Racing Blue</option>
+        <option value="italian" selected>Italian Racing Red</option>
+        <option value="german">German Racing Silver</option>
+        <option value="french">French Racing Blue</option>
+        <option value="japanese">Japanese Racing Red</option>
+        <option value="swedish">Swedish Racing Blue</option>
+        <option value="spanish">Spanish Racing</option>
+        <option value="international">International</option>
+      </select>
+      <label class="field-label">MODEL FULL NAME</label>
+      <input type="text" id="inp-model" value="Ferrari FF">
+    </div>
+
+    <!-- Car Image -->
+    <div class="section">
+      <div class="section-title" style="color:#f59e0b">📷 CAR IMAGE</div>
+      <div class="upload-box" id="car-upload-box">
+        <span class="placeholder">🖼️ Upload your Tin-Tin style illustration</span>
+      </div>
+      <input type="file" id="car-file" accept="image/*" style="display:none">
+      <button class="btn-remove" id="car-remove" style="display:none">Remove image</button>
+    </div>
+
+    <!-- Badge -->
+    <div class="section">
+      <div class="section-title" style="color:#e94560">🏁 CARCOPHONY BADGE</div>
+      <div class="upload-box" id="badge-upload-box">
+        <span class="placeholder">🖼️ Upload your badge / logo</span>
+      </div>
+      <input type="file" id="badge-file" accept="image/*" style="display:none">
+      <button class="btn-remove" id="badge-remove" style="display:none">Remove badge</button>
+      <p style="font-size:10px;color:#555;margin-top:6px;line-height:1.5">Appears in the card footer</p>
+    </div>
+
+    <!-- Car Stats -->
+    <div class="section">
+      <div class="section-title" style="color:#a78bfa">⚡ CAR STATS</div>
+      <label class="field-label">ENGINE</label>
+      <input type="text" id="inp-engine" value="6.3 Litre V12">
+      <label class="field-label">POWER (BHP)</label>
+      <input type="text" id="inp-power" value="651">
+      <label class="field-label">GEARBOX</label>
+      <input type="text" id="inp-transmission" value="Seven Speed Auto">
+      <label class="field-label">0–60 (seconds)</label>
+      <input type="text" id="inp-zero60" value="3.7">
+      <label class="field-label">TOP SPEED (mph)</label>
+      <input type="text" id="inp-topspeed" value="208">
+    </div>
+
+    <!-- Stats visibility -->
+    <div class="section">
+      <div class="section-title" style="color:#34d399">👁️ STATS ON CARD</div>
+      <p id="stats-hint" style="font-size:11px;color:#666;margin-bottom:10px;line-height:1.5">Toggle which stats appear on the card.</p>
+      <div class="toggle-row" data-key="engine">
+        <div class="toggle-switch on" data-key="engine"></div>
+        <span class="toggle-label active" data-key="engine">⚙️ ENGINE</span>
+      </div>
+      <div class="toggle-row" data-key="power">
+        <div class="toggle-switch on" data-key="power"></div>
+        <span class="toggle-label active" data-key="power">⚡ POWER</span>
+      </div>
+      <div class="toggle-row" data-key="transmission">
+        <div class="toggle-switch on" data-key="transmission"></div>
+        <span class="toggle-label active" data-key="transmission">🔧 GEARBOX</span>
+      </div>
+      <div class="toggle-row" data-key="zero60">
+        <div class="toggle-switch on" data-key="zero60"></div>
+        <span class="toggle-label active" data-key="zero60">🏁 0–60</span>
+      </div>
+      <div class="toggle-row" data-key="topspeed">
+        <div class="toggle-switch on" data-key="topspeed"></div>
+        <span class="toggle-label active" data-key="topspeed">🚀 TOP SPEED</span>
+      </div>
+    </div>
+
+    <!-- Card Size -->
+    <div class="section">
+      <div class="section-title" style="color:#60a5fa">📐 CARD SIZE</div>
+      <div class="radio-row">
+        <input type="radio" name="ratio" value="3:4" checked>
+        <span class="rl active">3:4 Classic Card</span><span class="rd">480×640</span>
+      </div>
+      <div class="radio-row">
+        <input type="radio" name="ratio" value="1:1">
+        <span class="rl">1:1 Square</span><span class="rd">500×500</span>
+      </div>
+      <div class="radio-row">
+        <input type="radio" name="ratio" value="9:16">
+        <span class="rl">9:16 Mobile</span><span class="rd">405×720</span>
+      </div>
+      <div class="radio-row">
+        <input type="radio" name="ratio" value="16:9">
+        <span class="rl">16:9 Landscape</span><span class="rd">720×405</span>
+      </div>
+      <div class="radio-row">
+        <input type="radio" name="ratio" value="A4">
+        <span class="rl">A4 Portrait</span><span class="rd">480×679</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTRE -->
+  <div id="centre">
+    <!-- Variant tabs -->
+    <div id="variant-bar">
+      <div class="vb-hint" id="vb-hint">Card Edition — each is a separate collectible</div>
+      <div id="variant-tabs">
+        <div class="vtab" data-variant="standard" style="background:#4a4a6a;border-color:#4a4a6a">
+          <div class="vname">STANDARD</div>
+          <div class="vdesc">All stats — the complete card</div>
+        </div>
+        <div class="vtab" data-variant="hero">
+          <div class="vname">HERO</div>
+          <div class="vdesc">One stat, enormous — max impact</div>
+        </div>
+        <div class="vtab" data-variant="duel">
+          <div class="vname">DUEL</div>
+          <div class="vdesc">Two stats — head-to-head battle</div>
+        </div>
+        <div class="vtab" data-variant="trio">
+          <div class="vname">TRIO</div>
+          <div class="vdesc">Three stats — fast-play card</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div id="preview-area">
+      <div id="preview-label">Standard Edition · 3:4 Classic Card · Italian Racing Red</div>
+      <div id="card-wrapper">
+        <div id="live-card"></div>
+      </div>
+      <div id="colour-pip">
+        <div class="pip" id="pip-colour"></div>
+        <span class="cname" id="pip-label">Italian Racing Red</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn-family" id="btn-family">🃏 VIEW FULL FAMILY</button>
+        <button id="btn-download">⬇ DOWNLOAD PNG</button>
+      </div>
+      <div id="tip-box">
+        Hit <strong id="tip-accent">🃏 VIEW FULL FAMILY</strong> to see all four editions side by side.
+        Download each variant separately — same car, same colours, four collectibles.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PACK MODAL -->
+<div id="pack-modal">
+  <div class="pm-hint">THE FULL CARD FAMILY</div>
+  <div class="pm-title" id="pm-title">Ferrari FF</div>
+  <div id="pack-cards"></div>
+  <button id="btn-close-pack">CLOSE</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const COLOURS = {
+  british:      { primary:"#0e4d0e", secondary:"#072707", accent:"#5cb85c", label:"British Racing Green" },
+  american:     { primary:"#1a2a6c", secondary:"#0a1040", accent:"#e63946", label:"American Racing Blue" },
+  italian:      { primary:"#c8102e", secondary:"#7a0018", accent:"#ffd700", label:"Italian Racing Red" },
+  german:       { primary:"#6b6b6b", secondary:"#3a3a3a", accent:"#d4af37", label:"German Racing Silver" },
+  french:       { primary:"#002395", secondary:"#00175c", accent:"#ED2939", label:"French Racing Blue" },
+  japanese:     { primary:"#bc002d", secondary:"#7a0018", accent:"#f5f5f5", label:"Japanese Racing Red" },
+  swedish:      { primary:"#005B99", secondary:"#003d66", accent:"#FECC02", label:"Swedish Racing Blue" },
+  spanish:      { primary:"#aa151b", secondary:"#6e0c10", accent:"#f1bf00", label:"Spanish Racing" },
+  international:{ primary:"#12122a", secondary:"#08081a", accent:"#e94560", label:"International" },
+};
+
+const MAKER_COUNTRY = {
+  "Aston Martin":"british","BMW":"german","Bugatti":"french","Dodge":"american",
+  "Ferrari":"italian","Ford":"british","Lamborghini":"italian","McLaren":"british",
+  "Mercedes":"german","Porsche":"german","Renault":"french","Toyota":"japanese","Volvo":"swedish",
+};
+
+const VARIANTS = [
+  { id:"standard", name:"STANDARD", badgeColor:"#4a4a6a", edition:"Standard Edition", maxStats:5 },
+  { id:"hero",     name:"HERO",     badgeColor:"#e94560", edition:"Hero Edition",     maxStats:1 },
+  { id:"duel",     name:"DUEL",     badgeColor:"#f59e0b", edition:"Duel Edition",     maxStats:2 },
+  { id:"trio",     name:"TRIO",     badgeColor:"#a78bfa", edition:"Trio Edition",     maxStats:3 },
+];
+
+const FIELDS = [
+  { key:"engine",       label:"ENGINE",   icon:"⚙️", unit:"" },
+  { key:"power",        label:"POWER",    icon:"⚡", unit:" bhp" },
+  { key:"transmission", label:"GEARBOX",  icon:"🔧", unit:"" },
+  { key:"zero60",       label:"0–60",     icon:"🏁", unit:"s" },
+  { key:"topspeed",     label:"TOP SPEED",icon:"🚀", unit:" mph" },
+];
+
+const RATIOS = {
+  "3:4":{ w:480, h:640, label:"3:4 Classic Card" },
+  "1:1":{ w:500, h:500, label:"1:1 Square" },
+  "9:16":{ w:405, h:720, label:"9:16 Mobile" },
+  "16:9":{ w:720, h:405, label:"16:9 Landscape" },
+  "A4":{ w:480, h:679, label:"A4 Portrait" },
+};
+
+const RANDOM_CARS = [
+  { maker:"Ferrari",     country:"italian",  model:"Ferrari F40",          engine:"2.9 Litre V8 Twin Turbo",   power:"478", transmission:"Five Speed Manual",  zero60:"3.7", topspeed:"201" },
+  { maker:"Lamborghini", country:"italian",  model:"Lamborghini Countach",  engine:"5.2 Litre V12",             power:"455", transmission:"Five Speed Manual",  zero60:"4.9", topspeed:"183" },
+  { maker:"Porsche",     country:"german",   model:"Porsche 911 GT2 RS",    engine:"3.8 Litre Flat-6 Turbo",   power:"700", transmission:"Seven Speed PDK",    zero60:"2.7", topspeed:"211" },
+  { maker:"McLaren",     country:"british",  model:"McLaren F1",            engine:"6.1 Litre V12",             power:"618", transmission:"Six Speed Manual",   zero60:"3.2", topspeed:"241" },
+  { maker:"Dodge",       country:"american", model:"Dodge Viper ACR",       engine:"8.4 Litre V10",             power:"645", transmission:"Six Speed Manual",   zero60:"3.4", topspeed:"177" },
+  { maker:"BMW",         country:"german",   model:"BMW M3 CSL E46",        engine:"3.2 Litre Straight-6",      power:"360", transmission:"Six Speed SMG",      zero60:"4.7", topspeed:"155" },
+  { maker:"Ford",        country:"british",  model:"Ford GT",               engine:"5.4 Litre V8 Supercharged", power:"550", transmission:"Six Speed Manual",   zero60:"3.3", topspeed:"205" },
+  { maker:"Bugatti",     country:"french",   model:"Bugatti Veyron",        engine:"8.0 Litre W16 Quad Turbo",  power:"1001",transmission:"Seven Speed DSG",    zero60:"2.5", topspeed:"253" },
+  { maker:"Aston Martin",country:"british",  model:"Aston Martin DB5",      engine:"4.0 Litre Straight-6",      power:"282", transmission:"Four Speed Manual",  zero60:"8.1", topspeed:"148" },
+  { maker:"Renault",     country:"french",   model:"Renault Clio V6",       engine:"3.0 Litre V6",              power:"230", transmission:"Six Speed Manual",   zero60:"5.8", topspeed:"147" },
+  { maker:"Toyota",      country:"japanese", model:"Toyota Supra MK4",      engine:"3.0 Litre Straight-6 Turbo",power:"320", transmission:"Six Speed Manual",   zero60:"4.6", topspeed:"180" },
+  { maker:"Mercedes",    country:"german",   model:"Mercedes SLR McLaren",  engine:"5.4 Litre V8 Supercharged", power:"626", transmission:"Five Speed Auto",    zero60:"3.4", topspeed:"208" },
+];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let state = {
+  maker: "Ferrari", model: "Ferrari FF", country: "italian",
+  engine: "6.3 Litre V12", power: "651", transmission: "Seven Speed Auto",
+  zero60: "3.7", topspeed: "208",
+  carImg: null, badgeImg: null,
+  visible: { engine:true, power:true, transmission:true, zero60:true, topspeed:true },
+  variant: "standard",
+  ratio: "3:4",
+  isCustom: false,
+};
+
+/* ═══════════════════════════════════════
+   CARD BUILDER
+═══════════════════════════════════════ */
+function getActiveFields(variantId) {
+  const v = VARIANTS.find(x => x.id === variantId);
+  let count = 0;
+  return FIELDS.filter(f => {
+    if (state.visible[f.key] && count < v.maxStats) { count++; return true; }
+    return false;
+  });
+}
+
+function formatVal(f) {
+  const raw = state[f.key] || '—';
+  if (f.key === 'power')   return raw + ' bhp';
+  if (f.key === 'zero60')  return raw + 's';
+  if (f.key === 'topspeed')return raw + ' mph';
+  return raw;
+}
+
+function buildCard(variantId, ratio, forExport) {
+  const { w, h } = ratio;
+  const cols = COLOURS[state.country] || COLOURS.italian;
+  const variant = VARIANTS.find(v => v.id === variantId);
+  const fields = getActiveFields(variantId);
+  const isLandscape = w > h;
+
+  if (variantId === 'hero' && !isLandscape) return buildHeroCard(w, h, cols, variant, fields, forExport);
+  if (isLandscape) return buildLandscapeCard(w, h, cols, variant, fields, forExport);
+  return buildPortraitCard(w, h, cols, variant, fields, forExport);
+}
+
+function buildPortraitCard(w, h, cols, variant, fields, forExport) {
+  const n = fields.length;
+  const headerH  = Math.round(h * 0.12);
+  const modelH   = 36;
+  const footerH  = 40;
+  const accentH  = 3;
+  const statsH   = n===0?0:n===1?Math.round(h*0.13):n===2?Math.round(h*0.20):n===3?Math.round(h*0.26):Math.round(h*0.33);
+  const imageH   = h - headerH - modelH - footerH - statsH - accentH;
+  const large    = n <= 2;
+  const makerFS  = Math.round(headerH * 0.6);
+
+  const card = el('div', {
+    class:'card-root card-portrait',
+    style:`width:${w}px;height:${h}px;box-shadow:0 0 0 3px ${cols.accent}55,0 24px 80px rgba(0,0,0,0.5);`
+  });
+
+  // Header
+  const hdr = el('div',{class:'card-header',style:`height:${headerH}px;background:linear-gradient(135deg,${cols.primary} 0%,${cols.secondary} 100%);`});
+  hdr.appendChild(el('div',{class:'hatch'}));
+  const mn = el('div',{class:'maker-name',style:`font-size:${makerFS}px;text-shadow:0 3px 0 rgba(0,0,0,0.4),0 0 30px ${cols.accent}80;`});
+  mn.textContent = state.maker.toUpperCase();
+  hdr.appendChild(mn);
+  const al = el('div',{class:'accent-line',style:`background:${cols.accent};`});
+  hdr.appendChild(al);
+  card.appendChild(hdr);
+
+  // Model bar
+  const mb = el('div',{class:'card-model-bar',style:`height:${modelH}px;font-size:${Math.min(17,Math.round(w*0.034))}px;border-bottom:1px solid ${cols.primary}18;`});
+  mb.textContent = state.model;
+  card.appendChild(mb);
+
+  // Image
+  const ia = el('div',{class:'card-image-area',style:`height:${imageH}px;`});
+  if (state.carImg) { const img=el('img',{src:state.carImg,alt:''}); ia.appendChild(img); }
+  else { const ni=el('div',{class:'no-img'}); ni.textContent='📷 Upload car image'; ia.appendChild(ni); }
+  card.appendChild(ia);
+
+  // Accent divider
+  const div=el('div',{class:'card-divider',style:`background:linear-gradient(90deg,${cols.primary},${cols.accent},${cols.primary});`});
+  card.appendChild(div);
+
+  // Stats
+  const stats=el('div',{class:'card-stats',style:`flex:1;padding:0 ${large?18:14}px;`});
+  fields.forEach((f,i)=>{
+    const row=el('div',{class:'stat-row',style:`padding-bottom:${i===n-1?0:large?10:6}px;${i===n-1?'border-bottom:none;':''}`});
+    const sl=el('div',{class:'stat-left'});
+    const si=el('div',{class:'stat-icon',style:`width:${large?32:26}px;height:${large?32:26}px;font-size:${large?15:12}px;background:${cols.primary}12;border:1.5px solid ${cols.primary}20;`});
+    si.textContent=f.icon;
+    sl.appendChild(si);
+    const slb=el('span',{class:'stat-label',style:`font-size:${large?13:11}px;`});
+    slb.textContent=f.label;
+    sl.appendChild(slb);
+    row.appendChild(sl);
+    const sv=el('span',{class:'stat-value',style:`font-size:${large?24:n===3?19:15}px;color:${cols.primary};`});
+    sv.textContent=formatVal(f);
+    row.appendChild(sv);
+    stats.appendChild(row);
+  });
+  if(n===0){const e=el('div',{style:'color:#ddd;text-align:center;font-size:13px;font-family:Rajdhani,sans-serif;'});e.textContent='Enable stats →';stats.appendChild(e);}
+  card.appendChild(stats);
+
+  // Footer
+  const ft=el('div',{class:'card-footer',style:`height:${footerH}px;background:linear-gradient(135deg,${cols.primary},${cols.secondary});border-top:3px solid ${cols.accent};`});
+  const fl=el('div',{class:'footer-left'});
+  if(state.badgeImg){const bi=el('img',{src:state.badgeImg,alt:''});fl.appendChild(bi);}
+  const fb=el('span',{class:'footer-brand',style:`color:${cols.accent};`});
+  fb.textContent='CARCOPHONY';
+  fl.appendChild(fb);
+  ft.appendChild(fl);
+  const vb=el('div',{class:'variant-badge',style:`background:${variant.badgeColor};`});
+  vb.textContent=variant.name;
+  ft.appendChild(vb);
+  card.appendChild(ft);
+
+  return card;
+}
+
+function buildHeroCard(w, h, cols, variant, fields) {
+  const heroField = fields[0];
+  const heroVal   = heroField ? (state[heroField.key]||'—') : '—';
+  const heroUnit  = heroField ? heroField.unit.trim() : '';
+  const makerFS   = Math.round(h * 0.068);
+  const modelFS   = Math.round(h * 0.024);
+  const labelFS   = Math.round(h * 0.054);
+  const unitFS    = Math.round(h * 0.05);
+  const numFS     = Math.round(h * 0.28);
+  const svgW      = w - 32;
+  const svgH      = Math.round(h * 0.5);
+  const useTextLength = heroVal.length > 5;
+
+  const card=el('div',{class:'card-root card-hero',style:`width:${w}px;height:${h}px;box-shadow:0 0 0 3px ${cols.accent},0 24px 80px rgba(0,0,0,0.7);`});
+
+  const bg=el('div',{class:'hero-bg',style:`background:linear-gradient(155deg,${cols.primary} 0%,${cols.secondary} 55%,#000 100%);`});
+  card.appendChild(bg);
+  card.appendChild(el('div',{class:'hero-hatch'}));
+
+  if(state.carImg){
+    const ii=el('div',{class:'hero-img'});
+    const im=el('img',{src:state.carImg,alt:''});
+    ii.appendChild(im); card.appendChild(ii);
+  }
+
+  const at=el('div',{class:'hero-accent-top',style:`background:${cols.accent};`});
+  card.appendChild(at);
+
+  const ht=el('div',{class:'hero-top'});
+  const hm=el('div',{class:'hero-maker',style:`font-size:${makerFS}px;text-shadow:0 2px 0 rgba(0,0,0,0.6),0 0 40px ${cols.accent}90;`});
+  hm.textContent=state.maker.toUpperCase();
+  ht.appendChild(hm);
+  const hmo=el('div',{class:'hero-model',style:`font-size:${modelFS}px;`});
+  hmo.textContent=state.model;
+  ht.appendChild(hmo);
+  card.appendChild(ht);
+
+  const ov=el('div',{class:'hero-overlay'});
+  if(heroField){
+    const lbl=el('div',{class:'hero-field-label',style:`font-size:${labelFS}px;color:${cols.accent};`});
+    lbl.textContent=`${heroField.icon} ${heroField.label}`;
+    ov.appendChild(lbl);
+  }
+
+  // SVG number
+  const tl = useTextLength ? `textLength="${svgW}" lengthAdjust="spacingAndGlyphs"` : '';
+  const svgNS='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(svgNS,'svg');
+  svg.setAttribute('width',svgW); svg.setAttribute('height',svgH);
+  svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
+  svg.style.overflow='visible';
+  svg.style.filter='drop-shadow(0 6px 0 rgba(0,0,0,0.5))';
+  const txt=document.createElementNS(svgNS,'text');
+  txt.setAttribute('x','50%'); txt.setAttribute('y','50%');
+  txt.setAttribute('dominant-baseline','middle'); txt.setAttribute('text-anchor','middle');
+  txt.setAttribute('font-weight','900');
+  txt.setAttribute('font-family',"'Black Han Sans',Impact,'Arial Black',sans-serif");
+  txt.setAttribute('fill','#ffffff');
+  txt.setAttribute('font-size',numFS);
+  if(useTextLength){txt.setAttribute('textLength',svgW);txt.setAttribute('lengthAdjust','spacingAndGlyphs');}
+  txt.textContent=heroVal;
+  svg.appendChild(txt);
+  ov.appendChild(svg);
+
+  if(heroUnit){
+    const un=el('div',{class:'hero-unit',style:`font-size:${unitFS}px;color:${cols.accent};`});
+    un.textContent=heroUnit.toUpperCase();
+    ov.appendChild(un);
+  }
+  card.appendChild(ov);
+
+  // Footer
+  const hf=el('div',{class:'hero-footer'});
+  const hfa=el('div',{class:'hero-footer-accent',style:`background:${cols.accent};`});
+  hf.appendChild(hfa);
+  const hfb=el('div',{class:'hero-footer-bar'});
+  const hfl=el('div',{class:'hero-footer-brand'});
+  if(state.badgeImg){const bi=el('img',{src:state.badgeImg,alt:''});hfl.appendChild(bi);}
+  const hfbr=el('span',{class:'footer-brand',style:`font-size:10px;color:${cols.accent};`});
+  hfbr.textContent='CARCOPHONY';
+  hfl.appendChild(hfbr);
+  hfb.appendChild(hfl);
+  const vb=el('div',{class:'variant-badge',style:`background:${variant.badgeColor};`});
+  vb.textContent=variant.name;
+  hfb.appendChild(vb);
+  hf.appendChild(hfb);
+  card.appendChild(hf);
+
+  return card;
+}
+
+function buildLandscapeCard(w, h, cols, variant, fields) {
+  const n = fields.length;
+  const card=el('div',{class:'card-root card-landscape',style:`width:${w}px;height:${h}px;box-shadow:0 0 0 3px ${cols.accent}55,0 24px 80px rgba(0,0,0,0.5);`});
+
+  const ll=el('div',{class:'land-left',style:`width:36%;background:linear-gradient(160deg,${cols.primary},${cols.secondary});padding:18px 10px;`});
+  ll.appendChild(el('div',{class:'hatch'}));
+  const top=el('div',{style:'text-align:center;z-index:1;'});
+  // Auto-shrink maker name to fit panel width
+  const panelW = Math.round(w * 0.36) - 20;
+  const maxFS  = Math.round(h * 0.14);
+  const svgNS2 = 'http://www.w3.org/2000/svg';
+  const lnSvg  = document.createElementNS(svgNS2,'svg');
+  lnSvg.setAttribute('width', panelW);
+  lnSvg.setAttribute('height', maxFS * 1.2);
+  lnSvg.style.overflow = 'visible';
+  lnSvg.style.zIndex = '1';
+  const lnTxt = document.createElementNS(svgNS2,'text');
+  lnTxt.setAttribute('x','50%');
+  lnTxt.setAttribute('y','80%');
+  lnTxt.setAttribute('text-anchor','middle');
+  lnTxt.setAttribute('font-family',"'Black Han Sans',Impact,'Arial Black',sans-serif");
+  lnTxt.setAttribute('font-weight','900');
+  lnTxt.setAttribute('fill','#ffffff');
+  lnTxt.setAttribute('font-size', maxFS);
+  lnTxt.setAttribute('textLength', panelW);
+  lnTxt.setAttribute('lengthAdjust','spacingAndGlyphs');
+  lnTxt.style.filter = `drop-shadow(0 2px 8px rgba(0,0,0,0.5))`;
+  lnTxt.textContent = state.maker.toUpperCase();
+  lnSvg.appendChild(lnTxt);
+  const ln = lnSvg;
+  top.appendChild(ln);
+  const lb=el('div',{class:'lm-bar',style:`width:36px;height:3px;background:${cols.accent};`});
+  top.appendChild(lb);
+  const lm=el('div',{class:'lm-model',style:`font-size:${Math.round(h*0.06)}px;`});
+  lm.textContent=state.model;
+  top.appendChild(lm);
+  ll.appendChild(top);
+  const bot=el('div',{class:'lm-bottom'});
+  if(state.badgeImg){const bi=el('img',{src:state.badgeImg,alt:'',style:'height:28px;object-fit:contain;'});bot.appendChild(bi);}
+  const lbr=el('span',{style:`font-size:9px;font-weight:800;color:${cols.accent};letter-spacing:3px;font-family:Rajdhani,sans-serif;`});
+  lbr.textContent='CARCOPHONY';
+  bot.appendChild(lbr);
+  const vbs=el('div',{class:'variant-badge small',style:`background:${variant.badgeColor};`});
+  vbs.textContent=variant.name;
+  bot.appendChild(vbs);
+  ll.appendChild(bot);
+  card.appendChild(ll);
+
+  const lr=el('div',{class:'land-right'});
+  const li=el('div',{class:'land-img'});
+  if(state.carImg){const im=el('img',{src:state.carImg,alt:''});li.appendChild(im);}
+  else{const ni=el('div',{style:'color:#ccc;font-size:12px;font-style:italic;font-family:Rajdhani,sans-serif;'});ni.textContent='Upload image';li.appendChild(ni);}
+  lr.appendChild(li);
+  const ls=el('div',{class:'land-stats',style:`border-top:3px solid ${cols.accent};background:${cols.primary}08;`});
+  fields.forEach((f,i)=>{
+    const row=el('div',{class:'land-stat-row',style:i===n-1?'border-bottom:none;':''});
+    const lsl=el('span',{class:'land-stat-label'});
+    lsl.textContent=`${f.icon} ${f.label}`;
+    row.appendChild(lsl);
+    const lsv=el('span',{class:'land-stat-val',style:`color:${cols.primary};`});
+    lsv.textContent=formatVal(f);
+    row.appendChild(lsv);
+    ls.appendChild(row);
+  });
+  lr.appendChild(ls);
+  card.appendChild(lr);
+  return card;
+}
+
+function el(tag, attrs) {
+  const e = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k,v])=>{
+    if(k==='class') e.className=v;
+    else if(k==='style') e.style.cssText=v;
+    else e.setAttribute(k,v);
+  });
+  return e;
+}
+
+/* ═══════════════════════════════════════
+   RENDER
+═══════════════════════════════════════ */
+function render() {
+  const ratio  = RATIOS[state.ratio];
+  const cols   = COLOURS[state.country] || COLOURS.italian;
+  const variant= VARIANTS.find(v=>v.id===state.variant);
+
+  // Build card
+  const lc = document.getElementById('live-card');
+  lc.innerHTML = '';
+  lc.appendChild(buildCard(state.variant, ratio, false));
+
+  // Scale preview
+  const maxDim = Math.max(ratio.w, ratio.h);
+  const avail  = Math.min(window.innerWidth - 320, window.innerHeight - 200);
+  const scale  = Math.min(0.95, avail / maxDim);
+  const wrapper = document.getElementById('card-wrapper');
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.transformOrigin = 'center center';
+  wrapper.style.marginBottom = `${Math.round((ratio.h * scale) - ratio.h)}px`;
+  wrapper.style.filter = 'drop-shadow(0 30px 80px rgba(0,0,0,0.8))';
+
+  // Label
+  document.getElementById('preview-label').textContent =
+    `${variant.edition} · ${ratio.label} · ${cols.label}`;
+
+  // Pip
+  document.getElementById('pip-colour').style.background = cols.primary;
+  document.getElementById('pip-colour').style.border = `2px solid ${cols.accent}`;
+  document.getElementById('pip-label').textContent = cols.label;
+
+  // Tip accent colour
+  document.getElementById('tip-accent').style.color = cols.accent;
+
+  // Family button colour
+  const bf = document.getElementById('btn-family');
+  bf.style.borderColor = cols.accent;
+  bf.style.color = cols.accent;
+
+  // Variant tab hint
+  document.getElementById('vb-hint').textContent =
+    `Card Edition — each is a separate collectible in the ${state.model} family`;
+
+  // Stats hint
+  const sh = document.getElementById('stats-hint');
+  if(state.variant==='hero') sh.textContent='Hero shows only the first enabled stat — make it count!';
+  else if(variant.maxStats<5) sh.textContent=`${variant.name} shows max ${variant.maxStats}. First ${variant.maxStats} enabled win.`;
+  else sh.textContent='Toggle which stats appear on the card.';
+
+  // Update toggle labels
+  const fields = getActiveFields(state.variant);
+  const activeKeys = new Set(fields.map(f=>f.key));
+  document.querySelectorAll('.toggle-row').forEach(row=>{
+    const key = row.dataset.key;
+    const sw  = row.querySelector('.toggle-switch');
+    const lbl = row.querySelector('.toggle-label');
+    const on  = state.visible[key];
+    const active = activeKeys.has(key);
+    sw.classList.toggle('on', on);
+    lbl.classList.toggle('active', active);
+    lbl.classList.toggle('enabled', on && !active);
+    // Remove any old limit note
+    const old = lbl.querySelector('.over-limit');
+    if(old) old.remove();
+    if(on && !active){const s=document.createElement('span');s.className='over-limit';s.textContent='(over limit)';lbl.appendChild(s);}
+  });
+
+  // Random button style
+  const rb = document.getElementById('btn-random');
+  rb.style.background = `linear-gradient(135deg,${cols.primary},${cols.secondary})`;
+  rb.style.borderColor = cols.accent;
+  rb.style.boxShadow = `0 4px 20px ${cols.accent}30`;
+
+  // Variant tabs
+  document.querySelectorAll('.vtab').forEach(tab=>{
+    const v = VARIANTS.find(x=>x.id===tab.dataset.variant);
+    const active = tab.dataset.variant === state.variant;
+    tab.style.background = active ? v.badgeColor : '#1a1a2e';
+    tab.style.borderColor = active ? v.badgeColor : '#252540';
+    tab.querySelector('.vdesc').style.color = active ? 'rgba(255,255,255,0.75)' : '#666';
+  });
+
+  // Radio labels
+  document.querySelectorAll('.radio-row').forEach(row=>{
+    const r = row.querySelector('input');
+    const l = row.querySelector('.rl');
+    l.classList.toggle('active', r.value===state.ratio);
+  });
+}
+
+/* ═══════════════════════════════════════
+   EVENTS
+═══════════════════════════════════════ */
+// Maker dropdown
+document.getElementById('sel-maker').addEventListener('change', function() {
+  const val = this.value;
+  state.isCustom = (val === 'Custom');
+  document.getElementById('custom-name-row').style.display = state.isCustom ? 'block' : 'none';
+  if (!state.isCustom) {
+    state.maker   = val;
+    state.country = MAKER_COUNTRY[val] || 'international';
+    document.getElementById('sel-country').value = state.country;
+  } else {
+    state.maker = 'Custom';
+    document.getElementById('inp-custom-maker').value = '';
+  }
+  render();
+});
+
+// Custom maker name — has its own input, no re-render storm
+document.getElementById('inp-custom-maker').addEventListener('input', function() {
+  state.maker = this.value || 'Custom';
+  render();
+});
+
+// Country
+document.getElementById('sel-country').addEventListener('change', function() {
+  state.country = this.value;
+  render();
+});
+
+// Model
+document.getElementById('inp-model').addEventListener('input', function() {
+  state.model = this.value;
+  render();
+});
+
+// Stats inputs
+['engine','power','transmission','zero60','topspeed'].forEach(key=>{
+  document.getElementById('inp-'+key).addEventListener('input', function() {
+    state[key] = this.value;
+    render();
+  });
+});
+
+// Toggles
+document.querySelectorAll('.toggle-row').forEach(row=>{
+  row.addEventListener('click', ()=>{
+    const key = row.dataset.key;
+    state.visible[key] = !state.visible[key];
+    render();
+  });
+});
+
+// Aspect ratio
+document.querySelectorAll('input[name=ratio]').forEach(r=>{
+  r.addEventListener('change', ()=>{ state.ratio=r.value; render(); });
+});
+
+// Variant tabs
+document.querySelectorAll('.vtab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{ state.variant=tab.dataset.variant; render(); });
+});
+
+// Car image
+document.getElementById('car-upload-box').addEventListener('click', ()=>document.getElementById('car-file').click());
+document.getElementById('car-file').addEventListener('change', function() {
+  const file = this.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.carImg = e.target.result;
+    const box = document.getElementById('car-upload-box');
+    box.innerHTML = `<div><div class="ok">✓ ${file.name}</div><div class="hint">Click to change</div></div>`;
+    document.getElementById('car-remove').style.display = 'block';
+    render();
+  };
+  reader.readAsDataURL(file);
+  this.value='';
+});
+document.getElementById('car-remove').addEventListener('click', ()=>{
+  state.carImg = null;
+  document.getElementById('car-upload-box').innerHTML = '<span class="placeholder">🖼️ Upload your Tin-Tin style illustration</span>';
+  document.getElementById('car-remove').style.display = 'none';
+  render();
+});
+
+// Badge image
+document.getElementById('badge-upload-box').addEventListener('click', ()=>document.getElementById('badge-file').click());
+document.getElementById('badge-file').addEventListener('change', function() {
+  const file = this.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.badgeImg = e.target.result;
+    const box = document.getElementById('badge-upload-box');
+    box.innerHTML = `<img class="upload-preview" src="${e.target.result}" alt=""><div><div class="ok">✓ Badge loaded</div><div class="hint">Click to change</div></div>`;
+    document.getElementById('badge-remove').style.display = 'block';
+    render();
+  };
+  reader.readAsDataURL(file);
+  this.value='';
+});
+document.getElementById('badge-remove').addEventListener('click', ()=>{
+  state.badgeImg = null;
+  document.getElementById('badge-upload-box').innerHTML = '<span class="placeholder">🖼️ Upload your badge / logo</span>';
+  document.getElementById('badge-remove').style.display = 'none';
+  render();
+});
+
+// Mystery car
+document.getElementById('btn-random').addEventListener('click', ()=>{
+  const pick = RANDOM_CARS[Math.floor(Math.random()*RANDOM_CARS.length)];
+  state.maker        = pick.maker;
+  state.model        = pick.model;
+  state.country      = pick.country;
+  state.engine       = pick.engine;
+  state.power        = pick.power;
+  state.transmission = pick.transmission;
+  state.zero60       = pick.zero60;
+  state.topspeed     = pick.topspeed;
+  state.isCustom     = false;
+  document.getElementById('sel-maker').value   = pick.maker;
+  document.getElementById('sel-country').value = pick.country;
+  document.getElementById('inp-model').value   = pick.model;
+  document.getElementById('inp-engine').value  = pick.engine;
+  document.getElementById('inp-power').value   = pick.power;
+  document.getElementById('inp-transmission').value = pick.transmission;
+  document.getElementById('inp-zero60').value  = pick.zero60;
+  document.getElementById('inp-topspeed').value= pick.topspeed;
+  document.getElementById('custom-name-row').style.display='none';
+  render();
+});
+
+// Download PNG
+document.getElementById('btn-download').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-download');
+  btn.disabled = true; btn.textContent = '⏳ GENERATING...';
+  const ratio = RATIOS[state.ratio];
+
+  // Build a clean off-screen card at full size for export
+  const exportCard = buildCard(state.variant, ratio, true);
+  exportCard.style.position = 'fixed';
+  exportCard.style.left = '-9999px';
+  exportCard.style.top = '0';
+  document.body.appendChild(exportCard);
+
+  try {
+    await new Promise(r=>setTimeout(r,100));
+    const canvas = await html2canvas(exportCard, { scale:3, useCORS:true, backgroundColor:null, logging:false });
+    const a = document.createElement('a');
+    const name = `carcophony-${state.maker}-${state.model}-${state.variant}`.replace(/\s+/g,'-').toLowerCase()+'.png';
+    a.download = name;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  } catch(e) {
+    alert('Download failed — try right-clicking the card and Save Image As.');
+  }
+  document.body.removeChild(exportCard);
+  btn.disabled = false; btn.textContent = '⬇ DOWNLOAD PNG';
+});
+
+// Full family pack view
+document.getElementById('btn-family').addEventListener('click', ()=>{
+  const ratio = RATIOS[state.ratio];
+  const cols  = COLOURS[state.country] || COLOURS.italian;
+  const pc    = document.getElementById('pack-cards');
+  pc.innerHTML='';
+
+  document.getElementById('pm-title').innerHTML =
+    `${state.maker} <span style="color:${cols.accent}">${state.model}</span>`;
+
+  VARIANTS.forEach(v=>{
+    // Temporarily override variant to build each card
+    const savedVariant = state.variant;
+    state.variant = v.id;
+    const card = buildCard(v.id, ratio, false);
+    state.variant = savedVariant;
+
+    const scale = 0.32;
+    const col = document.createElement('div');
+    col.className = 'pack-col';
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `transform:scale(${scale});transform-origin:top center;margin-bottom:${Math.round(ratio.h*scale)-ratio.h}px;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.8));`;
+    wrap.appendChild(card);
+    col.appendChild(wrap);
+
+    const vname=document.createElement('div');
+    vname.className='pv-name';
+    vname.style.color=v.badgeColor;
+    vname.textContent=v.name;
+    col.appendChild(vname);
+
+    const ved=document.createElement('div');
+    ved.className='pv-ed';
+    ved.textContent=v.edition;
+    col.appendChild(ved);
+
+    pc.appendChild(col);
+  });
+
+  document.getElementById('pack-modal').classList.add('open');
+});
+
+document.getElementById('btn-close-pack').addEventListener('click', ()=>{
+  document.getElementById('pack-modal').classList.remove('open');
+});
+
+// Re-render on resize
+window.addEventListener('resize', render);
+
+// Init
+render();
+</script>
+</body>
+</html>
