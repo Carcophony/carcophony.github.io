@@ -1032,7 +1032,6 @@ function getBotMove(color) {
     if ((row===0||row===7)&&(col===0||col===7)) score += 10*pers.corner;
     if (row===0||row===7||col===0||col===7)     score += 3*pers.corner;
     score += getNeighbours(idx).filter(n=>board[n]===null).length * pers.expansion;
-    score += countConversions(idx,color,board) * 5 * pers.aggression;
     if ([1,6,8,9,14,15,48,49,54,55,57,62].includes(idx)) score -= 3;
     for (const n of getNeighbours(idx)) {
       if (board[n] === color && pressure[n] && pressure[n].count > 0) score += 8 * pressure[n].count;
@@ -1041,27 +1040,6 @@ function getBotMove(color) {
     if (score>bestScore) { bestScore=score; best=idx; }
   }
   return best;
-}
-
-function countConversions(idx,color,boardState) {
-  const tb=[...boardState]; tb[idx]=color;
-  return getConversions(idx,color,tb).length;
-}
-
-function getConversions(idx,color,boardState) {
-  const dirs=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
-  const row=Math.floor(idx/8), col=idx%8, toFlip=[];
-  for (const [dr,dc] of dirs) {
-    const line=[];
-    let r=row+dr, c=col+dc;
-    while (r>=0&&r<8&&c>=0&&c<8) {
-      const ni=r*8+c;
-      if (boardState[ni]===null||boardState[ni]==='neutral') break;
-      if (boardState[ni]===color) { toFlip.push(...line); break; }
-      line.push(ni); r+=dr; c+=dc;
-    }
-  }
-  return toFlip;
 }
 
 // ══════════════════════════════════════
@@ -1112,22 +1090,6 @@ async function resolveMove() {
   clearAttempts();
 
   for (const [idx,color] of Object.entries(placed)) board[parseInt(idx)]=color;
-
-  // Sandwich conversions
-  const convAttempts={};
-  for (const [idx,color] of Object.entries(placed)) {
-    for (const target of getConversions(parseInt(idx),color,board)) {
-      convAttempts[target]=convAttempts[target]||[];
-      convAttempts[target].push(color);
-    }
-  }
-  for (const [target,colors] of Object.entries(convAttempts)) {
-    const t=parseInt(target);
-    if (colors.length===1) {
-      const old=board[t]; board[t]=colors[0];
-      log('SQ.'+t+': '+old.toUpperCase()+' converted to '+colors[0].toUpperCase(),'log-convert');
-    }
-  }
 
   // Reinforce — placing adjacent to own pressured counter clears its pressure
   for (const [idx, color] of Object.entries(placed)) {
