@@ -2,150 +2,153 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TURNCOAT</title>
-<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Oswald:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;700&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
+  /* ── RESET & ROOT ── */
   :root {
-    --ink: #1a1a14;
-    --paper: #d4c9a8;
-    --paper-dark: #b8ad8e;
-    --paper-darker: #9e9478;
+    --ink:       #1a1a14;
+    --paper:     #d4c9a8;
+    --paper-dk:  #b8ad8e;
+    --paper-dkr: #9e9478;
+    --warm:      #2a2520;
     --stamp-red: #8b1a1a;
-    --neutral: #3a3a2a;
-    --neutral-bright: #555544;
+    --neutral:   #3a3a2a;
+    --gold:      #c9a84c;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: #2a2520;
+  html {
+    height: 100%;
+    background: var(--warm);
+  }
+
+  body {
+    height: 100%;
     font-family: 'Share Tech Mono', monospace;
     color: var(--ink);
+    overflow: hidden;
+    background: var(--warm);
   }
 
-  /* ── FIXED FULL-SCREEN SHELL ── */
+  /* ════════════════════════════════════════
+     DESKTOP LAYOUT  (min-width: 700px)
+     Three columns: agents | board | status
+  ════════════════════════════════════════ */
   #shell {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    grid-template-columns: 1fr;
     height: 100vh;
     width: 100vw;
-    padding: 10px 12px 6px;
-    gap: 8px;
   }
 
-  /* ── HEADER ── */
-  #header {
+  /* Header */
+  #hdr {
+    background: var(--ink);
+    border-bottom: 2px solid var(--stamp-red);
+    padding: 6px 14px;
     display: flex;
     align-items: center;
     gap: 14px;
     flex-shrink: 0;
   }
 
-  .classified-bar {
+  .hdr-classified {
     background: var(--stamp-red);
     color: var(--paper);
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
-    font-size: 10px;
-    letter-spacing: 6px;
-    padding: 3px 12px;
+    font-size: 9px;
+    letter-spacing: 5px;
+    padding: 2px 10px;
     white-space: nowrap;
   }
 
-  .title {
+  .hdr-title {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
-    font-size: clamp(28px, 4vw, 52px);
+    font-size: clamp(22px, 3.5vw, 42px);
     color: var(--paper);
-    letter-spacing: 10px;
+    letter-spacing: 8px;
     line-height: 1;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
     white-space: nowrap;
   }
 
-  .subtitle {
+  .hdr-sub {
     font-family: 'Share Tech Mono', monospace;
-    color: var(--paper-dark);
     font-size: 9px;
     letter-spacing: 3px;
-    opacity: 0.6;
+    color: rgba(212,201,168,0.4);
     white-space: nowrap;
   }
 
-  .header-rule {
-    flex: 1;
-    height: 1px;
-    background: rgba(212,201,168,0.15);
-  }
+  .hdr-rule { flex: 1; height: 1px; background: rgba(212,201,168,0.1); }
 
-  .header-copy {
+  .hdr-copy {
     font-family: 'Share Tech Mono', monospace;
     font-size: 8px;
-    color: rgba(212,201,168,0.25);
+    color: rgba(212,201,168,0.2);
     letter-spacing: 2px;
     white-space: nowrap;
   }
 
-  /* ── MAIN AREA: left panel | board | right panel ── */
+  /* Main area */
   #main {
     display: grid;
-    grid-template-columns: 170px 1fr 160px;
-    gap: 10px;
-    min-height: 0; /* critical for grid children to shrink */
+    grid-template-columns: 160px 1fr 155px;
+    gap: 8px;
+    padding: 8px;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  /* ── PANELS (shared styles) ── */
+  /* Shared panel style */
   .panel {
     background: var(--paper);
-    background-image: repeating-linear-gradient(
-      0deg, transparent, transparent 27px,
-      rgba(0,0,0,0.055) 27px, rgba(0,0,0,0.055) 28px
-    );
-    border: 1px solid var(--paper-darker);
-    padding: 10px;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,0,0,0.05) 27px, rgba(0,0,0,0.05) 28px);
+    border: 1px solid var(--paper-dkr);
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     overflow: hidden;
-    box-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.35);
   }
 
   .panel-title {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 4px;
     color: var(--neutral);
     border-bottom: 1.5px solid var(--ink);
-    padding-bottom: 5px;
+    padding-bottom: 4px;
     flex-shrink: 0;
   }
 
-  /* ── AGENT CARDS ── */
+  /* Agent cards */
   .agent-card {
-    padding: 7px;
-    border: 1px solid var(--paper-darker);
+    padding: 5px 6px;
+    border: 1px solid var(--paper-dkr);
     background: rgba(255,255,255,0.3);
     flex-shrink: 0;
     transition: opacity 0.3s;
   }
 
   .agent-card.human { border-color: var(--ink); border-width: 2px; }
-  .agent-card.eliminated { opacity: 0.35; }
+  .agent-card.eliminated { opacity: 0.3; }
 
-  .agent-header {
+  .agent-hdr {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 3px;
+    gap: 5px;
+    margin-bottom: 2px;
   }
 
   .agent-pip {
-    width: 12px; height: 12px;
+    width: 11px; height: 11px;
     border-radius: 50%;
     flex-shrink: 0;
     border: 1.5px solid rgba(0,0,0,0.25);
@@ -153,13 +156,13 @@
 
   .agent-name {
     font-family: 'Special Elite', cursive;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--ink);
     flex: 1;
   }
 
   .agent-tag {
-    font-size: 8px;
+    font-size: 7px;
     letter-spacing: 1px;
     color: var(--neutral);
     font-family: 'Oswald', sans-serif;
@@ -167,25 +170,44 @@
 
   .agent-row {
     display: flex;
-    align-items: baseline;
     justify-content: space-between;
+    align-items: baseline;
   }
 
   .agent-score {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
     color: var(--ink);
     line-height: 1;
   }
 
-  .agent-move-display {
+  .agent-move {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
+    font-size: 8px;
     color: var(--neutral);
   }
 
-  /* ── BOARD COLUMN ── */
+  /* Field log */
+  #resolve-log {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: var(--neutral);
+    line-height: 1.8;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid var(--paper-dkr);
+    padding: 4px 6px;
+  }
+
+  .log-entry  { display: block; }
+  .log-clash  { color: var(--stamp-red); }
+  .log-convert{ color: #1a4a1a; }
+  .log-neutral{ color: #555544; }
+
+  /* Board column */
   #board-col {
     display: flex;
     flex-direction: column;
@@ -206,30 +228,31 @@
     flex-shrink: 0;
   }
 
-  #board-wrapper {
+  #board-wrap {
+    background: var(--paper);
     border: 2px solid var(--ink);
-    padding: 8px;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+    padding: 6px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
     position: relative;
     flex: 1;
     min-height: 0;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    background: var(--paper);
+    overflow: hidden;
   }
 
   .board-stamp {
     position: absolute;
-    top: 6px; right: 8px;
+    top: 5px; right: 7px;
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
-    font-size: 8px;
+    font-size: 7px;
     letter-spacing: 3px;
     color: var(--stamp-red);
-    border: 1.5px solid var(--stamp-red);
-    padding: 1px 5px;
-    opacity: 0.35;
+    border: 1px solid var(--stamp-red);
+    padding: 1px 4px;
+    opacity: 0.3;
     transform: rotate(3deg);
   }
 
@@ -246,36 +269,24 @@
   .cell {
     aspect-ratio: 1;
     background: rgba(255,255,255,0.4);
-    border: 1px solid rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(6px, 0.9vw, 9px);
-    color: rgba(0,0,0,0.2);
-    transition: background 0.12s, border-color 0.12s;
+    font-size: clamp(5px, 0.8vw, 9px);
+    color: rgba(0,0,0,0.18);
+    transition: background 0.1s;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
     min-width: 0; min-height: 0;
   }
 
-  .cell:hover:not(.occupied):not(.blocked) {
-    background: rgba(139,26,26,0.12);
-    border-color: rgba(139,26,26,0.4);
-  }
-
-  .cell.legal {
-    animation: pulse-legal 2s ease infinite;
-    cursor: pointer;
-  }
-
-  .cell.selected {
-    background: rgba(139,26,26,0.2) !important;
-    border: 2px solid var(--stamp-red) !important;
-    animation: none;
-  }
-
+  .cell:hover:not(.occupied) { background: rgba(139,26,26,0.1); }
+  .cell.legal { animation: pulse-legal 2s ease infinite; cursor: pointer; }
+  .cell.selected { background: rgba(139,26,26,0.2) !important; border: 2px solid var(--stamp-red) !important; animation: none; }
   .cell.occupied { cursor: default; }
 
   @keyframes pulse-legal {
@@ -283,8 +294,9 @@
     50%      { background: rgba(139,26,26,0.15); }
   }
 
+  /* Counters */
   .counter {
-    width: 78%; height: 78%;
+    width: 80%; height: 80%;
     border-radius: 50%;
     position: absolute;
     top: 50%; left: 50%;
@@ -293,235 +305,42 @@
     transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
   }
 
-  .counter.red    { background: radial-gradient(circle at 35% 35%, #d9534f, #8b1a1a); }
-  .counter.yellow { background: radial-gradient(circle at 35% 35%, #f0c040, #8b7a1a); }
-  .counter.green  { background: radial-gradient(circle at 35% 35%, #5cb85c, #1a4a1a); }
-  .counter.cyan   { background: radial-gradient(circle at 35% 35%, #5bc0de, #1a4a5a); }
-  .counter.neutral{ background: radial-gradient(circle at 35% 35%, #888, #333); }
+  .counter.red     { background: radial-gradient(circle at 35% 35%, #d9534f, #8b1a1a); }
+  .counter.yellow  { background: radial-gradient(circle at 35% 35%, #f0c040, #8b7a1a); }
+  .counter.green   { background: radial-gradient(circle at 35% 35%, #5cb85c, #1a4a1a); }
+  .counter.cyan    { background: radial-gradient(circle at 35% 35%, #5bc0de, #1a4a5a); }
+  .counter.neutral { background: radial-gradient(circle at 35% 35%, #888, #333); }
 
   .counter.attempt {
-    opacity: 0.4;
-    transform: translate(-50%,-50%) scale(0.82);
+    opacity: 0.38;
+    transform: translate(-50%,-50%) scale(0.8);
     box-shadow: none;
   }
 
-  @keyframes flash-in {
-    0%   { transform: translate(-50%,-50%) scale(0); opacity: 0; }
-    60%  { transform: translate(-50%,-50%) scale(1.15); }
-    100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
-  }
-  .counter.flash { animation: flash-in 0.4s ease; }
-
-  /* ── CONTROLS ── */
-  .controls {
-    display: flex;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  .btn {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    letter-spacing: 2px;
-    font-size: 10px;
-    padding: 7px 14px;
-    border: 2px solid;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.12s;
-    background: var(--paper);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-    white-space: nowrap;
-  }
-
-  .btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
-  .btn-primary { border-color: var(--ink); color: var(--ink); }
-  .btn-primary:hover { background: var(--ink); color: var(--paper); }
-  .btn-danger  { border-color: var(--stamp-red); color: var(--stamp-red); }
-  .btn-danger:hover  { background: var(--stamp-red); color: var(--paper); }
-  .btn:disabled { opacity: 0.28; cursor: not-allowed; pointer-events: none; }
-
-  /* ── RIGHT PANEL SECTIONS ── */
-  .section-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 8px;
-    letter-spacing: 3px;
-    color: var(--neutral);
-    margin-bottom: 3px;
-    flex-shrink: 0;
-  }
-
-  .status-text {
-    font-family: 'Special Elite', cursive;
-    font-size: 11px;
-    color: var(--ink);
-    line-height: 1.45;
-    flex-shrink: 0;
-  }
-
-  .move-counter {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    font-size: 26px;
-    color: var(--ink);
-    text-align: center;
-    letter-spacing: 2px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .move-counter small {
-    display: block;
-    font-size: 8px;
-    letter-spacing: 3px;
-    font-weight: 300;
-    color: var(--neutral);
-  }
-
-  .divider {
-    border: none;
-    border-top: 1px solid var(--paper-darker);
-    flex-shrink: 0;
-  }
-
-  .standings-row {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    line-height: 1.8;
-    color: var(--ink);
-    flex-shrink: 0;
-  }
-
-  .objective-text {
-    font-family: 'Special Elite', cursive;
-    font-size: 10px;
-    color: var(--neutral);
-    line-height: 1.5;
-    flex-shrink: 0;
-  }
-
-  /* ── LOG ── */
-  #resolve-log {
-    background: rgba(255,255,255,0.25);
-    border: 1px solid var(--paper-darker);
-    padding: 5px 7px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: var(--neutral);
-    flex: 1;
-    overflow-y: auto;
-    line-height: 1.8;
-    min-height: 0;
-  }
-
-  .log-entry  { display: block; }
-  .log-clash  { color: var(--stamp-red); }
-  .log-convert{ color: #1a4a1a; }
-  .log-neutral{ color: var(--neutral-bright); }
-
-  /* ── FOOTER ── */
-  #footer {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    color: rgba(212,201,168,0.2);
-    letter-spacing: 3px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  /* ── OVERLAY ── */
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(26,26,20,0.92);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-  .overlay.active { display: flex; }
-
-  .overlay-box {
-    background: var(--paper);
-    background-image: repeating-linear-gradient(
-      0deg, transparent, transparent 27px,
-      rgba(0,0,0,0.055) 27px, rgba(0,0,0,0.055) 28px
-    );
-    border: 3px solid var(--ink);
-    padding: 28px 36px;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.4);
-  }
-
-  .overlay-stamp {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    font-size: 9px;
-    letter-spacing: 5px;
-    color: var(--stamp-red);
-    border: 2px solid var(--stamp-red);
-    display: inline-block;
-    padding: 2px 10px;
-    margin-bottom: 12px;
-    transform: rotate(-2deg);
-  }
-
-  .overlay-title {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    font-size: 28px;
-    letter-spacing: 5px;
-    color: var(--ink);
-    margin-bottom: 10px;
-  }
-
-  .overlay-text {
-    font-family: 'Special Elite', cursive;
-    font-size: 13px;
-    color: var(--neutral);
-    line-height: 1.6;
-    margin-bottom: 16px;
-  }
-
-  .scores-list { text-align: left; border: 1px solid var(--paper-darker); padding: 10px; background: rgba(255,255,255,0.3); margin-bottom: 16px; }
-
-  .score-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-  }
-  .score-row:last-child { border-bottom: none; }
-  .score-pip  { width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; }
-  .score-name { flex: 1; font-family: 'Special Elite', cursive; }
-  .score-val  { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; }
-
+  /* Pressure dots */
   .counter.pressured-1::after {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%,-50%);
-    width: 32%; height: 32%;
+    width: 30%; height: 30%;
     border-radius: 50%;
-    background: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.65);
     pointer-events: none;
   }
+
   .counter.pressured-2::after {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%,-50%);
-    width: 40%; height: 40%;
+    width: 42%; height: 42%;
     border-radius: 50%;
-    background: rgba(255,255,255,0.8);
-    border: 2px solid rgba(255,200,0,0.7);
+    background: rgba(255,255,255,0.85);
+    border: 2px solid rgba(201,168,76,0.9);
     pointer-events: none;
   }
+
   .counter.pressured-3::after {
     content: '';
     position: absolute;
@@ -533,39 +352,387 @@
     border: 3px solid rgba(139,26,26,0.95);
     pointer-events: none;
   }
-  @keyframes turncoat-flip {
-    0%   { transform: translate(-50%,-50%) scaleX(1); }
-    45%  { transform: translate(-50%,-50%) scaleX(0); }
-    55%  { transform: translate(-50%,-50%) scaleX(0); }
-    100% { transform: translate(-50%,-50%) scaleX(1); }
+
+  @keyframes flash-in {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+    60%  { transform: translate(-50%,-50%) scale(1.12); }
+    100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
   }
-  .counter.flipping { animation: turncoat-flip 0.6s ease; }
+  .counter.flash { animation: flash-in 0.4s ease; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 10px;
+    padding: 8px 14px;
+    border: 2px solid;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.1s;
+    background: var(--paper);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
+  .btn-primary { border-color: var(--ink); color: var(--ink); }
+  .btn-primary:hover, .btn-primary:active { background: var(--ink); color: var(--paper); }
+  .btn-danger  { border-color: var(--stamp-red); color: var(--stamp-red); }
+  .btn-danger:hover, .btn-danger:active  { background: var(--stamp-red); color: var(--paper); }
+  .btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+  /* Right panel sections */
+  .sec-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--neutral);
+    flex-shrink: 0;
+  }
+
+  #status-text {
+    font-family: 'Special Elite', cursive;
+    font-size: 11px;
+    color: var(--ink);
+    line-height: 1.45;
+    flex-shrink: 0;
+  }
+
+  .move-ctr {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .move-ctr small {
+    display: block;
+    font-size: 8px;
+    letter-spacing: 3px;
+    font-weight: 300;
+    color: var(--neutral);
+  }
+
+  .divider { border: none; border-top: 1px solid var(--paper-dkr); flex-shrink: 0; }
+
+  #standings {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    line-height: 1.9;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+
+  .obj-text {
+    font-family: 'Special Elite', cursive;
+    font-size: 10px;
+    color: var(--neutral);
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  #ftr {
+    background: var(--ink);
+    border-top: 1px solid rgba(212,201,168,0.1);
+    padding: 4px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .ftr-brand {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--paper);
+    opacity: 0.4;
+  }
+
+  .ftr-copy {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: rgba(212,201,168,0.2);
+    letter-spacing: 2px;
+  }
+
+  /* ════════════════════════════════════════
+     MOBILE LAYOUT  (max-width: 699px)
+     Three zones stacked vertically:
+     top strip | board | bottom controls
+  ════════════════════════════════════════ */
+  @media (max-width: 699px) {
+
+    body { overflow: hidden; }
+
+    #shell {
+      grid-template-rows: auto 1fr auto;
+      height: 100dvh; /* dynamic viewport height — handles mobile browser chrome */
+    }
+
+    /* Slimmer header on mobile */
+    #hdr { padding: 5px 10px; gap: 8px; }
+    .hdr-sub { display: none; }
+    .hdr-rule { display: none; }
+    .hdr-copy { display: none; }
+    .hdr-classified { font-size: 7px; letter-spacing: 3px; padding: 2px 6px; }
+    .hdr-title { font-size: clamp(20px, 6vw, 30px); letter-spacing: 5px; }
+
+    /* Main becomes a single column */
+    #main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      padding: 6px;
+      gap: 5px;
+    }
+
+    /* Left panel becomes top score strip */
+    #panel-left {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: none;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+      background-image: none;
+    }
+
+    /* Hide panel title and log on mobile */
+    #panel-left .panel-title { display: none; }
+    #resolve-log { display: none; }
+
+    /* Compact agent cards for mobile top strip */
+    .agent-card {
+      padding: 5px 4px;
+      text-align: center;
+      background: var(--paper);
+      border: 1px solid var(--paper-dkr);
+    }
+
+    .agent-card.human { border-color: var(--ink); border-width: 2px; }
+
+    .agent-hdr {
+      flex-direction: column;
+      gap: 2px;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .agent-pip { width: 14px; height: 14px; }
+    .agent-name { font-size: 9px; text-align: center; }
+    .agent-tag { font-size: 6px; display: none; }
+
+    .agent-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .agent-score { font-size: 20px; }
+    .agent-move { font-size: 7px; text-align: center; }
+
+    /* Board column fills available space */
+    #board-col {
+      min-height: 0;
+      gap: 4px;
+    }
+
+    .phase-bar {
+      font-size: 8px;
+      letter-spacing: 2px;
+      padding: 3px 8px;
+    }
+
+    #board-wrap {
+      flex: 1;
+      min-height: 0;
+      padding: 4px;
+    }
+
+    /* Grid stays square via aspect-ratio on cells */
+    #grid { gap: 1px; }
+    .cell { font-size: clamp(5px, 1.8vw, 8px); }
+
+    /* Controls — big fat buttons */
+    .controls {
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      font-size: 11px;
+      padding: 12px 10px;
+      flex: 1;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    /* Right panel becomes bottom info strip */
+    #panel-right {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      background: none;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+      background-image: none;
+    }
+
+    #panel-right .panel-title { display: none; }
+    #panel-right .divider { display: none; }
+    #panel-right .obj-text { display: none; }
+
+    /* Status takes left column */
+    #mobile-status-wrap {
+      background: var(--paper);
+      border: 1px solid var(--paper-dkr);
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    /* Standings takes right column */
+    #mobile-standings-wrap {
+      background: var(--paper);
+      border: 1px solid var(--paper-dkr);
+      padding: 6px 8px;
+    }
+
+    #status-text { font-size: 10px; line-height: 1.35; }
+    #standings { font-size: 9px; line-height: 1.7; }
+
+    .move-ctr { font-size: 20px; }
+    .move-ctr small { font-size: 7px; letter-spacing: 2px; }
+
+    .sec-label { font-size: 7px; letter-spacing: 2px; }
+
+    /* Slim footer on mobile */
+    #ftr { padding: 3px 10px; }
+    .ftr-brand { font-size: 9px; letter-spacing: 3px; }
+    .ftr-copy { display: none; }
+  }
+
+  /* ── OVERLAY ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,20,0.92);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .overlay.active { display: flex; }
+
+  .overlay-box {
+    background: var(--paper);
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,0,0,0.05) 27px, rgba(0,0,0,0.05) 28px);
+    border: 3px solid var(--ink);
+    padding: 24px 32px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+  }
+
+  .overlay-stamp {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: var(--stamp-red);
+    border: 2px solid var(--stamp-red);
+    display: inline-block;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+    transform: rotate(-2deg);
+  }
+
+  .overlay-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 5px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .overlay-text {
+    font-family: 'Special Elite', cursive;
+    font-size: 12px;
+    color: var(--neutral);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .scores-list {
+    text-align: left;
+    border: 1px solid var(--paper-dkr);
+    padding: 8px;
+    background: rgba(255,255,255,0.3);
+    margin-bottom: 14px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+
+  .score-row:last-child { border-bottom: none; }
+  .score-pip  { width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; }
+  .score-name { flex: 1; font-family: 'Special Elite', cursive; }
+  .score-val  { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; }
 </style>
 </head>
 <body>
 
 <div id="shell">
 
-  <!-- HEADER -->
-  <div id="header">
+  <!-- ── HEADER ── -->
+  <div id="hdr">
+    <div class="hdr-classified">CLASSIFIED — CARCOPHONY</div>
     <div>
-      <div class="classified-bar">CLASSIFIED — CARCOPHONY</div>
-      <div class="title">TURNCOAT</div>
-      <div class="subtitle">SIMULTANEOUS GRID OPERATIONS</div>
+      <div class="hdr-title">TURNCOAT</div>
+      <div class="hdr-sub">SIMULTANEOUS GRID OPERATIONS</div>
     </div>
-    <div class="header-rule"></div>
-    <div class="header-copy">© CARCOPHONY</div>
+    <div class="hdr-rule"></div>
+    <div class="hdr-copy">© CARCOPHONY</div>
   </div>
 
-  <!-- MAIN -->
+  <!-- ── MAIN ── -->
   <div id="main">
 
-    <!-- LEFT: AGENT DOSSIERS -->
-    <div class="panel" id="dossier">
+    <!-- LEFT: AGENTS + LOG -->
+    <div class="panel" id="panel-left">
       <div class="panel-title">ACTIVE AGENTS</div>
 
       <div class="agent-card human" id="card-red">
-        <div class="agent-header">
+        <div class="agent-hdr">
           <div class="agent-pip" style="background:radial-gradient(circle at 35% 35%,#d9534f,#8b1a1a)"></div>
           <div>
             <div class="agent-name">YOU</div>
@@ -574,12 +741,12 @@
         </div>
         <div class="agent-row">
           <div class="agent-score" id="score-red">1</div>
-          <div class="agent-move-display" id="move-red">—</div>
+          <div class="agent-move" id="move-red">—</div>
         </div>
       </div>
 
       <div class="agent-card" id="card-yellow">
-        <div class="agent-header">
+        <div class="agent-hdr">
           <div class="agent-pip" style="background:radial-gradient(circle at 35% 35%,#f0c040,#8b7a1a)"></div>
           <div>
             <div class="agent-name">VOLKOV</div>
@@ -588,12 +755,12 @@
         </div>
         <div class="agent-row">
           <div class="agent-score" id="score-yellow">1</div>
-          <div class="agent-move-display" id="move-yellow">—</div>
+          <div class="agent-move" id="move-yellow">—</div>
         </div>
       </div>
 
       <div class="agent-card" id="card-green">
-        <div class="agent-header">
+        <div class="agent-hdr">
           <div class="agent-pip" style="background:radial-gradient(circle at 35% 35%,#5cb85c,#1a4a1a)"></div>
           <div>
             <div class="agent-name">MULLER</div>
@@ -602,12 +769,12 @@
         </div>
         <div class="agent-row">
           <div class="agent-score" id="score-green">1</div>
-          <div class="agent-move-display" id="move-green">—</div>
+          <div class="agent-move" id="move-green">—</div>
         </div>
       </div>
 
       <div class="agent-card" id="card-cyan">
-        <div class="agent-header">
+        <div class="agent-hdr">
           <div class="agent-pip" style="background:radial-gradient(circle at 35% 35%,#5bc0de,#1a4a5a)"></div>
           <div>
             <div class="agent-name">CHEN</div>
@@ -616,12 +783,11 @@
         </div>
         <div class="agent-row">
           <div class="agent-score" id="score-cyan">1</div>
-          <div class="agent-move-display" id="move-cyan">—</div>
+          <div class="agent-move" id="move-cyan">—</div>
         </div>
       </div>
 
-      <!-- LOG fills remaining space -->
-      <div class="section-title" style="margin-top:auto;">FIELD LOG</div>
+      <div class="panel-title" style="margin-top:auto;">FIELD LOG</div>
       <div id="resolve-log"></div>
     </div>
 
@@ -632,72 +798,76 @@
         <span id="standoff-label">STANDOFFS: 0/3</span>
       </div>
 
-      <div id="board-wrapper">
+      <div id="board-wrap">
         <div class="board-stamp">EYES ONLY</div>
         <div id="grid"></div>
       </div>
 
       <div class="controls">
-        <button class="btn btn-primary" id="btn-commit" onclick="commitMove()" disabled>COMMIT MOVE</button>
+        <button class="btn btn-primary" id="btn-commit" onclick="commitMove()" disabled>COMMIT</button>
         <button class="btn btn-primary" id="btn-resolve" onclick="resolveMove()" disabled>RESOLVE</button>
-        <button class="btn btn-danger" onclick="newGame()">NEW OPERATION</button>
+        <button class="btn btn-danger" onclick="newGame()">NEW OP</button>
       </div>
     </div>
 
-    <!-- RIGHT: STATUS + STANDINGS -->
-    <div class="panel">
+    <!-- RIGHT: STATUS (desktop) / bottom strip (mobile) -->
+    <div class="panel" id="panel-right">
       <div class="panel-title">FIELD STATUS</div>
 
-      <div class="section-title">REPORT</div>
-      <div class="status-text" id="status-text">Select your square. Commit your move.</div>
-
-      <hr class="divider">
-
-      <div class="move-counter">
-        <small>OPERATION</small>
-        <span id="move-num">1</span>
+      <!-- Mobile wraps these in their own boxes -->
+      <div id="mobile-status-wrap">
+        <div class="sec-label">REPORT</div>
+        <div id="status-text">Select your square. Commit your move.</div>
+        <hr class="divider" style="margin:6px 0;">
+        <div class="move-ctr"><small>OPERATION</small><span id="move-num">1</span></div>
       </div>
 
       <hr class="divider">
 
-      <div class="section-title">OBJECTIVE</div>
-      <div class="objective-text">Occupy the most squares. Board full = game over.</div>
+      <div id="mobile-standings-wrap">
+        <div class="sec-label">STANDINGS</div>
+        <div id="standings"></div>
+      </div>
 
       <hr class="divider">
-
-      <div class="section-title">STANDINGS</div>
-      <div class="standings-row" id="standings"></div>
+      <div class="sec-label">OBJECTIVE</div>
+      <div class="obj-text">Occupy the most squares. Board full = game over.</div>
 
       <hr class="divider">
-
-      <div class="section-title">BRIEFING</div>
-      <div class="objective-text">Unique pick = placement. Clash = no one gets it. Clashes pressure enemy neighbours. 3 marks = TURNS. Place adjacent to your OWN pressured counter to clear all pressure marks on it.</div>
+      <div class="sec-label">HOW IT WORKS</div>
+      <div class="obj-text">Unique pick = placed. Clash = nobody gets it. Clashes pressure enemy neighbours — 3 marks and they TURN. Place next to your own dotted counter to clear the pressure.</div>
     </div>
 
+  </div><!-- /main -->
+
+  <!-- ── FOOTER ── -->
+  <div id="ftr">
+    <div class="ftr-brand">TURNCOAT</div>
+    <div class="ftr-copy">CARCOPHONY · ALL RIGHTS RESERVED</div>
   </div>
 
-  <!-- FOOTER -->
-  <div id="footer">TURNCOAT — CARCOPHONY — ALL RIGHTS RESERVED</div>
+</div><!-- /shell -->
 
-</div>
-
-<!-- GAME OVER OVERLAY -->
+<!-- ── GAME OVER OVERLAY ── -->
 <div class="overlay" id="overlay">
   <div class="overlay-box">
     <div class="overlay-stamp" id="overlay-stamp">OPERATION COMPLETE</div>
     <div class="overlay-title" id="overlay-title">DEBRIEF</div>
     <div class="overlay-text" id="overlay-text"></div>
     <div class="scores-list" id="scores-list"></div>
-    <button class="btn btn-primary" onclick="newGame()">NEW OPERATION</button>
+    <button class="btn btn-primary" onclick="newGame()" style="width:100%;padding:12px;">NEW OPERATION</button>
   </div>
 </div>
 
 <script>
+// ══════════════════════════════════════
+// GAME DATA
+// ══════════════════════════════════════
 const PLAYERS = [
-  { id:'red',    name:'YOU',    bot:false, color:'red',    pip:'radial-gradient(circle at 35% 35%,#d9534f,#8b1a1a)' },
-  { id:'yellow', name:'VOLKOV', bot:true,  color:'yellow', pip:'radial-gradient(circle at 35% 35%,#f0c040,#8b7a1a)' },
-  { id:'green',  name:'MULLER', bot:true,  color:'green',  pip:'radial-gradient(circle at 35% 35%,#5cb85c,#1a4a1a)' },
-  { id:'cyan',   name:'CHEN',   bot:true,  color:'cyan',   pip:'radial-gradient(circle at 35% 35%,#5bc0de,#1a4a5a)' },
+  { id:'red',    name:'YOU',    bot:false, pip:'radial-gradient(circle at 35% 35%,#d9534f,#8b1a1a)' },
+  { id:'yellow', name:'VOLKOV', bot:true,  pip:'radial-gradient(circle at 35% 35%,#f0c040,#8b7a1a)' },
+  { id:'green',  name:'MULLER', bot:true,  pip:'radial-gradient(circle at 35% 35%,#5cb85c,#1a4a1a)' },
+  { id:'cyan',   name:'CHEN',   bot:true,  pip:'radial-gradient(circle at 35% 35%,#5bc0de,#1a4a5a)' },
 ];
 
 const BOT_PERSONALITY = {
@@ -706,13 +876,16 @@ const BOT_PERSONALITY = {
   cyan:   { aggression:1.0, expansion:1.0, corner:1.6 },
 };
 
-let board, scores, eliminated, moveNum, standoffs, phase, selectedCell, playerMove, botMoves, gameActive;
-let pressure = {};
+let board, scores, eliminated, moveNum, standoffs, phase, selectedCell, playerMove, botMoves, gameActive, pressure;
 
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
 function initGame() {
   board      = new Array(64).fill(null);
   scores     = { red:0, yellow:0, green:0, cyan:0 };
   eliminated = { red:false, yellow:false, green:false, cyan:false };
+  pressure   = {};
   moveNum=1; standoffs=0; phase='select';
   selectedCell=null; playerMove=null; botMoves={}; gameActive=true;
 
@@ -722,7 +895,6 @@ function initGame() {
     scores[color] = 1;
   }
 
-  // Reset agent cards
   for (const p of PLAYERS) {
     document.getElementById(`card-${p.id}`).classList.remove('eliminated');
     document.getElementById(`move-${p.id}`).textContent = '—';
@@ -742,7 +914,9 @@ function initGame() {
 
 function newGame() { initGame(); }
 
-// ── BOARD ──
+// ══════════════════════════════════════
+// BOARD
+// ══════════════════════════════════════
 function renderBoard() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -757,8 +931,8 @@ function renderBoard() {
       cell.classList.add('occupied');
       const c = document.createElement('div');
       const pLv = pressure[i] ? Math.min(pressure[i].count, 3) : 0;
-      c.className = `counter ${board[i]}` + (pLv ? ' pressured-'+pLv : '');
-      c.id = `counter-${i}`;
+      c.className = 'counter ' + board[i] + (pLv ? ' pressured-'+pLv : '');
+      c.id = 'counter-'+i;
       cell.appendChild(c);
     } else {
       const num = document.createElement('span');
@@ -778,7 +952,9 @@ function renderBoard() {
   }
 }
 
-// ── LEGAL MOVES ──
+// ══════════════════════════════════════
+// LEGAL MOVES
+// ══════════════════════════════════════
 function getAdjacentEmpty(color) {
   const empty = new Set();
   board.forEach((v,i) => {
@@ -802,7 +978,9 @@ function getLegalMoves(color) {
   return eliminated[color] ? [] : getAdjacentEmpty(color);
 }
 
-// ── INPUT ──
+// ══════════════════════════════════════
+// PLAYER INPUT
+// ══════════════════════════════════════
 function selectCell(idx) {
   if (phase !== 'select' || eliminated.red) return;
   if (!getLegalMoves('red').includes(idx)) return;
@@ -810,7 +988,6 @@ function selectCell(idx) {
   selectedCell = idx;
   playerMove   = idx;
 
-  // Visual update without full redraw
   document.querySelectorAll('.cell.selected').forEach(c => {
     c.classList.remove('selected');
     c.classList.add('legal');
@@ -821,7 +998,7 @@ function selectCell(idx) {
   cell.classList.add('selected');
   cell.onclick = null;
 
-  setStatus(`SQ.${idx} selected — commit when ready.`);
+  setStatus('SQ.' + idx + ' selected — commit when ready.');
   document.getElementById('btn-commit').disabled = false;
 }
 
@@ -836,16 +1013,19 @@ function commitMove() {
   phase = 'revealing';
   document.getElementById('btn-commit').disabled  = true;
   document.getElementById('btn-resolve').disabled = false;
-  document.getElementById('phase-label').textContent = 'MOVES COMMITTED — RESOLVE WHEN READY';
+  document.getElementById('phase-label').textContent = 'MOVES COMMITTED — RESOLVE';
   setStatus('All agents committed. Hit RESOLVE.');
 }
 
-// ── BOT AI ──
+// ══════════════════════════════════════
+// BOT AI
+// ══════════════════════════════════════
 function getBotMove(color) {
   const legals = getLegalMoves(color);
   if (!legals.length) return null;
   const pers = BOT_PERSONALITY[color];
   let best=null, bestScore=-Infinity;
+
   for (const idx of legals) {
     let score = 0;
     const row=Math.floor(idx/8), col=idx%8;
@@ -854,14 +1034,9 @@ function getBotMove(color) {
     score += getNeighbours(idx).filter(n=>board[n]===null).length * pers.expansion;
     score += countConversions(idx,color,board) * 5 * pers.aggression;
     if ([1,6,8,9,14,15,48,49,54,55,57,62].includes(idx)) score -= 3;
-
-    // REINFORCE: favour placing adjacent to own pressured counters
     for (const n of getNeighbours(idx)) {
-      if (board[n] === color && pressure[n] && pressure[n].count > 0) {
-        score += 8 * pressure[n].count;
-      }
+      if (board[n] === color && pressure[n] && pressure[n].count > 0) score += 8 * pressure[n].count;
     }
-
     score += (Math.random()-0.5)*2;
     if (score>bestScore) { bestScore=score; best=idx; }
   }
@@ -889,7 +1064,9 @@ function getConversions(idx,color,boardState) {
   return toFlip;
 }
 
-// ── RESOLUTION ──
+// ══════════════════════════════════════
+// RESOLUTION
+// ══════════════════════════════════════
 async function resolveMove() {
   document.getElementById('btn-resolve').disabled = true;
   phase = 'resolving';
@@ -898,13 +1075,12 @@ async function resolveMove() {
   if (playerMove!==null && !eliminated.red) allMoves.red = playerMove;
   for (const [color,move] of Object.entries(botMoves)) if (move!==null) allMoves[color]=move;
 
-  // Show bot choices
   for (const p of PLAYERS) {
     if (p.bot && !eliminated[p.id])
-      document.getElementById(`move-${p.id}`).textContent = botMoves[p.id]!==null ? `SQ.${botMoves[p.id]}` : 'SKIP';
+      document.getElementById('move-'+p.id).textContent = botMoves[p.id]!==null ? 'SQ.'+botMoves[p.id] : 'SKIP';
   }
   if (!eliminated.red && playerMove!==null)
-    document.getElementById('move-red').textContent = `SQ.${playerMove}`;
+    document.getElementById('move-red').textContent = 'SQ.'+playerMove;
 
   const bySquare = {};
   for (const [color,idx] of Object.entries(allMoves)) {
@@ -923,12 +1099,12 @@ async function resolveMove() {
     const i=parseInt(idx);
     if (colors.length===1) {
       placed[i]=colors[0]; anyPlaced=true;
-      log(`SQ.${i}: ${colors[0].toUpperCase()} placed`,'log-convert');
+      log('SQ.'+i+': '+colors[0].toUpperCase()+' placed','log-convert');
     } else if (colors.length===4) {
       board[i]='neutral'; anyPlaced=true;
-      log(`SQ.${i}: ALL AGENTS — neutral inserted`,'log-neutral');
+      log('SQ.'+i+': ALL AGENTS — neutral inserted','log-neutral');
     } else {
-      log(`SQ.${i}: CLASH — ${colors.map(c=>c.toUpperCase()).join(' vs ')}`,'log-clash');
+      log('SQ.'+i+': CLASH — '+colors.map(c=>c.toUpperCase()).join(' vs '),'log-clash');
     }
   }
 
@@ -937,6 +1113,7 @@ async function resolveMove() {
 
   for (const [idx,color] of Object.entries(placed)) board[parseInt(idx)]=color;
 
+  // Sandwich conversions
   const convAttempts={};
   for (const [idx,color] of Object.entries(placed)) {
     for (const target of getConversions(parseInt(idx),color,board)) {
@@ -948,66 +1125,63 @@ async function resolveMove() {
     const t=parseInt(target);
     if (colors.length===1) {
       const old=board[t]; board[t]=colors[0];
-      log(`SQ.${t}: ${old.toUpperCase()} converted to ${colors[0].toUpperCase()}`,'log-convert');
+      log('SQ.'+t+': '+old.toUpperCase()+' converted to '+colors[0].toUpperCase(),'log-convert');
     }
   }
 
-
-
-  // ── REINFORCE ──
-  // Successfully placing a counter adjacent to a friendly pressured counter
-  // clears all pressure marks on that counter.
+  // Reinforce — placing adjacent to own pressured counter clears its pressure
   for (const [idx, color] of Object.entries(placed)) {
     const i = parseInt(idx);
     for (const n of getNeighbours(i)) {
       if (board[n] === color && pressure[n] && pressure[n].count > 0) {
-        log(`SQ.${n}: REINFORCED — pressure cleared by ${color.toUpperCase()}`, 'log-convert');
+        log('SQ.'+n+': REINFORCED — pressure cleared','log-convert');
         delete pressure[n];
       }
     }
   }
 
-  // ── THE INFORMER ──
-  // Clashes apply pressure to occupied enemy neighbours.
-  // Three pressure marks = counter turns. Max one mark per round per counter.
-  const pressuredThisRound = new Set(); // prevent double-pressure in same round
+  // The Informer — clashes pressure neighbouring enemy counters
+  const pressuredThisRound = new Set();
   for (const [idx, colors] of Object.entries(bySquare)) {
     if (colors.length >= 2 && colors.length < 4) {
       const i = parseInt(idx);
       const presser = colors.includes('red') ? 'red' : colors[colors.length - 1];
       for (const n of getNeighbours(i)) {
         if (board[n] && board[n] !== 'neutral' && board[n] !== presser) {
-          if (pressuredThisRound.has(n)) continue; // only one mark per round
+          if (pressuredThisRound.has(n)) continue;
           pressuredThisRound.add(n);
-          if (!pressure[n]) pressure[n] = { count: 0, lastAgent: null };
+          if (!pressure[n]) pressure[n] = { count:0, lastAgent:null };
           pressure[n].count++;
           pressure[n].lastAgent = presser;
-          log(`SQ.${n}: under pressure (${pressure[n].count}/3)`, 'log-neutral');
+          log('SQ.'+n+': under pressure ('+pressure[n].count+'/3)','log-neutral');
           if (pressure[n].count >= 3) {
             const old = board[n];
             board[n] = presser;
             delete pressure[n];
-            log(`SQ.${n}: ${old.toUpperCase()} TURNS — informer activated`, 'log-clash');
+            log('SQ.'+n+': '+old.toUpperCase()+' TURNS — informer activated','log-clash');
           }
         }
       }
     }
   }
 
+  // Standoff check
   if (!anyPlaced) {
     standoffs++;
-    log(`STANDOFF #${standoffs} — no placements`,'log-clash');
-    document.getElementById('standoff-label').textContent=`STANDOFFS: ${standoffs}/3`;
+    log('STANDOFF #'+standoffs+' — no placements','log-clash');
+    document.getElementById('standoff-label').textContent = 'STANDOFFS: '+standoffs+'/3';
   }
 
+  // Recalculate scores
   scores={red:0,yellow:0,green:0,cyan:0};
   for (const cell of board) if (cell&&cell!=='neutral'&&scores[cell]!==undefined) scores[cell]++;
 
+  // Eliminations
   for (const p of PLAYERS) {
     if (!eliminated[p.id]&&scores[p.id]===0) {
       eliminated[p.id]=true;
-      log(`${p.name} ELIMINATED`,'log-clash');
-      document.getElementById(`card-${p.id}`).classList.add('eliminated');
+      log(p.name+' ELIMINATED','log-clash');
+      document.getElementById('card-'+p.id).classList.add('eliminated');
     }
   }
 
@@ -1015,7 +1189,7 @@ async function resolveMove() {
   updateScores();
 
   await sleep(600);
-  for (const p of PLAYERS) document.getElementById(`move-${p.id}`).textContent='—';
+  for (const p of PLAYERS) document.getElementById('move-'+p.id).textContent='—';
   selectedCell=null; playerMove=null;
 
   const active=PLAYERS.filter(p=>!eliminated[p.id]);
@@ -1034,13 +1208,12 @@ async function resolveMove() {
   document.getElementById('move-num').textContent=moveNum;
   renderBoard();
 
-  // If red has no legal moves but is not eliminated — forfeit turn automatically
+  // Forfeit turn if no legal moves
   const redLegals = getLegalMoves('red');
   if (!eliminated.red && redLegals.length === 0) {
     document.getElementById('btn-commit').disabled = true;
     document.getElementById('phase-label').textContent = 'NO LEGAL MOVE — TURN FORFEITED';
-    setStatus('No legal move available. Your turn is forfeited. Hit RESOLVE to continue.');
-    // Auto-generate bot moves and enable resolve
+    setStatus('No legal move. Your turn is forfeited. Hit RESOLVE.');
     botMoves = {};
     playerMove = null;
     for (const p of PLAYERS) {
@@ -1061,8 +1234,8 @@ function showAttempts(allMoves) {
     const cell=document.getElementById('grid').children[idx];
     if (!cell||board[idx]!==null) continue;
     const c=document.createElement('div');
-    c.className=`counter ${color} attempt flash`;
-    c.id=`attempt-${color}`;
+    c.className='counter '+color+' attempt flash';
+    c.id='attempt-'+color;
     cell.appendChild(c);
   }
 }
@@ -1071,6 +1244,9 @@ function clearAttempts() {
   document.querySelectorAll('[id^="attempt-"]').forEach(el=>el.remove());
 }
 
+// ══════════════════════════════════════
+// END GAME
+// ══════════════════════════════════════
 function endGame(reason) {
   gameActive=false;
   const sorted=[...PLAYERS].sort((a,b)=>scores[b.id]-scores[a.id]);
@@ -1087,13 +1263,13 @@ function endGame(reason) {
     title.textContent=winner.id==='red'?'MISSION ACCOMPLISHED':'COMPROMISED';
     text.textContent=winner.id==='red'
       ?'All hostile agents neutralised. Control confirmed.'
-      :`${winner.name} has eliminated all competition. You have been burned.`;
+      :winner.name+' has eliminated all competition. You have been burned.';
   } else {
     stamp.textContent='OPERATION COMPLETE';
     title.textContent=winner.id==='red'?'MISSION SUCCESS':'MISSION FAILURE';
     text.textContent=winner.id==='red'
       ?'The board is yours. Control confirmed.'
-      :`${winner.name} controls the field. You have been outmanoeuvred.`;
+      :winner.name+' controls the field. You have been outmanoeuvred.';
   }
 
   const list=document.getElementById('scores-list');
@@ -1101,32 +1277,35 @@ function endGame(reason) {
   sorted.forEach((p,i)=>{
     const row=document.createElement('div');
     row.className='score-row';
-    row.innerHTML=`<div class="score-pip" style="background:${p.pip}"></div><div class="score-name">${i===0?'★ ':''}${p.name}</div><div class="score-val">${scores[p.id]}</div>`;
+    row.innerHTML='<div class="score-pip" style="background:'+p.pip+'"></div><div class="score-name">'+(i===0?'★ ':'')+p.name+'</div><div class="score-val">'+scores[p.id]+'</div>';
     list.appendChild(row);
   });
 
   document.getElementById('overlay').classList.add('active');
 }
 
+// ══════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════
 function updateScores() {
-  for (const p of PLAYERS) document.getElementById(`score-${p.id}`).textContent=scores[p.id];
+  for (const p of PLAYERS) document.getElementById('score-'+p.id).textContent=scores[p.id];
 
   const sorted=[...PLAYERS].sort((a,b)=>scores[b.id]-scores[a.id]);
   const medals=['1ST','2ND','3RD','4TH'];
   const el=document.getElementById('standings');
   if (el) el.innerHTML=sorted.map((p,i)=>{
     const you=p.id==='red';
-    return `<span style="color:${you?'var(--stamp-red)':'var(--neutral)'};font-weight:${you?'bold':'normal'}">${medals[i]} ${p.name} — ${scores[p.id]}</span>`;
+    return '<span style="color:'+(you?'var(--stamp-red)':'var(--neutral)')+';font-weight:'+(you?'bold':'normal')+'">'+medals[i]+' '+p.name+' — '+scores[p.id]+'</span>';
   }).join('<br>');
 }
 
 function setStatus(msg) { document.getElementById('status-text').textContent=msg; }
 
-function log(msg,cls='') {
+function log(msg,cls) {
   const el=document.getElementById('resolve-log');
   const e=document.createElement('span');
-  e.className=`log-entry ${cls}`;
-  e.textContent=`> ${msg}`;
+  e.className='log-entry '+(cls||'');
+  e.textContent='> '+msg;
   el.appendChild(e);
   el.scrollTop=el.scrollHeight;
 }
@@ -1134,6 +1313,9 @@ function log(msg,cls='') {
 function clearLog() { document.getElementById('resolve-log').innerHTML=''; }
 function sleep(ms)  { return new Promise(r=>setTimeout(r,ms)); }
 
+// ══════════════════════════════════════
+// START
+// ══════════════════════════════════════
 initGame();
 </script>
 </body>
